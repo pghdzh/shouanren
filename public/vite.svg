@@ -1,0 +1,8 @@
+<!-- shorekeeper-fav.svg — 极简方形图标（适合 favicon） -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img"
+  aria-label="守岸人 图标">
+  <rect width="32" height="32" rx="6" fill="#02131a" />
+  <path d="M6 20c5-6 13-6 20-2" fill="none" stroke="#4fe9df" stroke-width="1.8"
+    stroke-linecap="round" />
+  <circle cx="9.5" cy="15" r="1.1" fill="#66c8ff" />
+</svg>
