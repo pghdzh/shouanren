@@ -9,9 +9,20 @@
         </button>
       </div>
       <div class="gallery-grid">
-        <div v-for="(img, index) in images" :key="img.id" class="card" @click="openLightbox(index)" ref="cards">
+        <div
+          v-for="(img, index) in images"
+          :key="img.id"
+          class="card"
+          @click="openLightbox(index)"
+          ref="cards"
+        >
           <div class="card-inner">
-            <img :src="img.src" :alt="img.alt" loading="lazy" @load="onImageLoad($event)" />
+            <img
+              :src="img.src"
+              :alt="img.alt"
+              loading="lazy"
+              @load="onImageLoad($event)"
+            />
             <div class="overlay">
               <span>查看大图</span>
             </div>
@@ -30,12 +41,17 @@
     </section>
     <aside class="ranking-panel">
       <div class="panel-header" @click="expanded = !expanded">
-        <h3 class="ranking-title">上传排行榜</h3>
-        <span class="toggle-icon">{{ expanded ? "收起▾" : "展开▸" }}</span>
+        <h3 class="ranking-title">排行榜</h3><span>共{{ imgTotal }}张</span>
+        <span class="toggle-icon">{{ expanded ? "▾" : "▸" }}</span>
       </div>
       <transition name="fade">
         <ul v-if="expanded" class="ranking-list">
-          <li v-for="(item, idx) in rankingList" :key="idx" class="ranking-item" :class="`rank-${idx + 1}`">
+          <li
+            v-for="(item, idx) in rankingList"
+            :key="idx"
+            class="ranking-item"
+            :class="`rank-${idx + 1}`"
+          >
             <span class="rank">{{ idx + 1 }}</span>
             <span class="name">{{ item.nickname }}</span>
             <span class="count">{{ item.count }} 张</span>
@@ -52,14 +68,16 @@
     </div>
 
     <!-- 上传弹窗 -->
-    <div v-if="uploadModalOpen" class="upload-modal-overlay" @click.self="closeUploadModal">
+    <div
+      v-if="uploadModalOpen"
+      class="upload-modal-overlay"
+      @click.self="closeUploadModal"
+    >
       <div class="upload-modal">
         <h3>批量上传图片</h3>
         <div class="tip-container">
           <ul class="tips-list">
-            <li>
-              审核规则：1.不要 AI 图 2.不要色情倾向 3.要我能认出是椿。
-            </li>
+            <li>审核规则：1.不要 AI 图 2.不要色情倾向 3.要我能认出是岸宝。</li>
             <li>
               由于没有用户系统，我这边不好做审核反馈，但只要显示上传成功，我这边肯定能收到。
             </li>
@@ -81,7 +99,13 @@
         </label>
         <label>
           选择图片（最多 {{ remaining }} 张）：
-          <input ref="fileInput" type="file" multiple accept="image/*" @change="handleFileSelect" />
+          <input
+            ref="fileInput"
+            type="file"
+            multiple
+            accept="image/*"
+            @change="handleFileSelect"
+          />
         </label>
         <p class="tip" v-if="selectedFiles.length">
           已选 {{ selectedFiles.length }} 张
@@ -176,7 +200,7 @@ const page = 1;
 const pageSize = 99;
 
 const fetchRanking = async () => {
-  const res = await getRankingList({ page, pageSize, character_key: "chun" });
+  const res = await getRankingList({ page, pageSize, character_key: "shou" });
   if (res.success) {
     rankingList.value = res.data;
   } else {
@@ -214,7 +238,7 @@ async function observeNewCards(startIndex = 0) {
     observerCard.observe(cards[i]);
   }
 }
-
+const imgTotal = ref(0);
 async function loadNextPage() {
   if (loading.value || finished.value) return;
   loading.value = true;
@@ -223,9 +247,10 @@ async function loadNextPage() {
       page: pageImage.value,
       limit: limit.value,
       sortBy: sortBy.value,
-      character_key: "chun",
+      character_key: "shou",
       order: order.value,
     });
+    imgTotal.value = res.total;
     const likedIds = getLikedIds();
     const list = (
       res.images as Array<{ url: string; like_count: number; id: number }>
@@ -303,7 +328,7 @@ function getTodayKey() {
 const uploadedToday = ref<number>(
   Number(localStorage.getItem(getTodayKey()) || 0)
 );
-const remaining = computed(() => Math.max(24 - uploadedToday.value, 0));
+const remaining = computed(() => Math.max(42 - uploadedToday.value, 0));
 
 // 控制提交按钮
 const canSubmit = computed(() => {
@@ -384,7 +409,7 @@ async function submitUpload() {
     const res = await uploadImages(
       selectedFiles.value,
       nickname.value.trim(),
-      "chun"
+      "shou"
     );
     const uploadedCount = res.data.length;
     // 更新 localStorage
@@ -589,13 +614,13 @@ $neon-pink: #ff66c4;
     .sort-controls {
       margin: 16px 0;
 
+      /* 守岸人风格的排序按钮（替换原 .sort-btn） */
       .sort-btn {
         /* 基础布局（保留左侧装饰空间） */
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 10px 28px 10px 56px;
-        /* 左侧留足装饰空间 */
+        padding: 10px 28px 10px 56px; /* 左侧留装饰 */
         font-size: 1rem;
         line-height: 1;
         font-family: "PingFang SC", "Noto Sans SC", "Helvetica Neue", Arial,
@@ -604,59 +629,84 @@ $neon-pink: #ff66c4;
         border-radius: 28px;
         position: relative;
         overflow: hidden;
-        border: 1px solid rgba(158, 24, 32, 0.08);
+        border: 1px solid rgba(110, 200, 255, 0.06);
 
-        /* 红椿渐变与文字色（写死） */
-        background: linear-gradient(90deg,
-            #ffdfdf 0%,
-            #ff7b90 50%,
-            #9e1820 100%);
-        color: #3b1618;
-        /* 暗红/棕，保证可读 */
-        box-shadow: 0 8px 20px rgba(158, 24, 32, 0.06),
-          inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        /* 守岸人：冰蓝晶体渐变 + 深海毛玻璃感 */
+        background: linear-gradient(
+          90deg,
+          rgba(11, 44, 58, 0.28) 0%,
+          rgba(8, 36, 48, 0.36) 50%,
+          rgba(6, 28, 36, 0.42) 100%
+        );
+        color: #cfeff8; /* 冰蓝文字 */
+        box-shadow: 0 10px 28px rgba(0, 12, 18, 0.48),
+          /* 深海投影 */ inset 0 1px 0 rgba(255, 255, 255, 0.02),
+          /* 内高光 */ 0 0 18px rgba(80, 200, 240, 0.04); /* 冰蓝光晕 */
 
-        transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.25, 1),
-          box-shadow 0.22s ease, background 0.28s ease, color 0.18s;
+        transition: transform 200ms cubic-bezier(0.2, 0.9, 0.25, 1),
+          box-shadow 200ms ease, background 260ms ease, color 160ms ease,
+          filter 200ms ease;
+        -webkit-tap-highlight-color: transparent;
 
-        /* 在徽章中心叠加一个小花瓣形状（简化） */
+        /* 左侧晶体装饰（替代原花瓣） */
         &::after {
           content: "";
           position: absolute;
-          left: 22px;
+          left: 18px;
           top: 50%;
-          transform: translate(-50%, -52%) rotate(-12deg);
+          transform: translateY(-50%) rotate(-12deg);
           width: 18px;
-          height: 18px;
-          background: radial-gradient(8px 6px at 30% 30%,
-              rgba(255, 255, 255, 0.9),
-              transparent 35%),
-            linear-gradient(180deg,
-              rgba(255, 122, 134, 0.95),
-              rgba(158, 24, 32, 0.95));
-          clip-path: polygon(50% 0%, 68% 24%, 50% 100%, 32% 24%);
+          height: 22px;
           border-radius: 4px;
-          box-shadow: 0 2px 6px rgba(158, 24, 32, 0.12);
+          background: linear-gradient(
+            180deg,
+            rgba(191, 247, 255, 0.95),
+            rgba(110, 220, 255, 0.9)
+          );
+          box-shadow: 0 6px 18px rgba(40, 140, 170, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.5);
+          clip-path: polygon(50% 0, 75% 25%, 50% 100%, 25% 25%); /* 菱形/晶体 */
           pointer-events: none;
           z-index: 3;
-          transition: transform 220ms ease, opacity 220ms ease;
+          transition: transform 220ms ease, opacity 220ms ease,
+            box-shadow 220ms ease;
         }
 
-        /* hover：微抬起，颜色加深，高光出现 */
+        /* hover：微抬起，晶体发光 */
         &:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 14px 36px rgba(158, 24, 32, 0.12),
-            inset 0 1px 0 rgba(255, 255, 255, 0.5);
-          background: linear-gradient(90deg,
-              #ffd6da 0%,
-              #ff6a82 50%,
-              #8b141c 100%);
-          color: #ffffff;
+          transform: translateY(-5px) scale(1.02);
+          box-shadow: 0 22px 66px rgba(0, 18, 24, 0.62),
+            0 0 44px rgba(80, 200, 240, 0.14),
+            inset 0 2px 8px rgba(255, 255, 255, 0.03);
+          filter: saturate(1.08) brightness(1.03);
+          color: #12b3d3;
+          background: linear-gradient(
+            90deg,
+            rgba(12, 54, 70, 0.38) 0%,
+            rgba(10, 46, 62, 0.46) 50%,
+            rgba(8, 36, 48, 0.5) 100%
+          );
         }
 
         &:hover::after {
-          transform: translate(-50%, -60%) rotate(-6deg) scale(1.02);
+          transform: translateY(-56%) rotate(-6deg) scale(1.06);
+          box-shadow: 0 10px 30px rgba(60, 180, 210, 0.16),
+            inset 0 2px 6px rgba(255, 255, 255, 0.2);
           opacity: 1;
+        }
+
+        /* active（按下）反馈 */
+        &:active {
+          transform: translateY(-2px) scale(0.995);
+          box-shadow: 0 10px 28px rgba(0, 12, 18, 0.5),
+            0 0 20px rgba(80, 200, 240, 0.06);
+        }
+
+        /* keyboard focus 可见环（无障碍） */
+        &:focus-visible {
+          outline: none;
+          box-shadow: 0 22px 66px rgba(0, 18, 24, 0.62),
+            0 0 0 6px rgba(60, 180, 210, 0.06);
         }
       }
     }
@@ -676,7 +726,6 @@ $neon-pink: #ff66c4;
         }
 
         &.loaded {
-
           // Blur-up & grayscale removed
           .card-inner img {
             filter: none;
@@ -880,125 +929,146 @@ $neon-pink: #ff66c4;
     cursor: pointer;
     user-select: none;
 
-    /* 文本与主渐变（红椿专用） */
-    color: #ffffff;
-    background: linear-gradient(90deg, #ffb3b9 0%, #ff4f4f 55%, #9e1820 100%);
+    /* 守岸人 — 冰蓝晶体 + 深海毛玻璃 */
+    color: #022b33; /* 深色文字以保证在浅色晶核上可读 */
+    background: linear-gradient(
+      90deg,
+      rgba(191, 247, 255, 0.96) 0%,
+      rgba(110, 223, 255, 0.92) 50%,
+      rgba(46, 170, 200, 0.96) 100%
+    );
     border-radius: 28px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
 
-    /* 阴影（柔和 + 椿色光晕） */
-    box-shadow: 0 14px 36px rgba(184, 58, 74, 0.12),
-      /* 主体柔和投影（暖红） */
-      0 0 28px rgba(255, 79, 79, 0.08);
-    /* 霓虹晕光（猩红） */
+    backdrop-filter: blur(6px) saturate(120%);
+    -webkit-backdrop-filter: blur(6px) saturate(120%);
+
+    /* 卡片质感：深色阴影 + 冰蓝光晕 */
+    box-shadow: 0 14px 40px rgba(2, 20, 28, 0.55),
+      /* 深海投影 */ 0 0 28px rgba(80, 200, 240, 0.08); /* 冰蓝光晕 */
 
     overflow: visible;
-    transition: transform 200ms cubic-bezier(0.2, 0.9, 0.25, 1),
-      box-shadow 200ms ease, background 220ms ease;
+    transition: transform 220ms cubic-bezier(0.2, 0.9, 0.25, 1),
+      box-shadow 220ms ease, background 260ms ease, filter 220ms ease;
 
-    /* hover：微抬起、霓虹更强 */
+    /* hover：微抬起、光晕增强 */
     &:hover {
       transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 26px 54px rgba(170, 60, 70, 0.16),
-        0 0 36px rgba(255, 79, 79, 0.16);
+      box-shadow: 0 28px 80px rgba(2, 24, 34, 0.62),
+        0 0 46px rgba(80, 200, 240, 0.16);
+      filter: brightness(1.02) saturate(1.05);
     }
   }
-
 
   .upload-modal-overlay {
     position: fixed;
     inset: 0;
-    /* 深色底并微带暖红泛光，让弹窗更突出且氛围与椿一致 */
-    background: linear-gradient(180deg,
-        rgba(10, 6, 6, 0.76),
-        rgba(10, 6, 6, 0.58));
+    z-index: 2000;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
-    backdrop-filter: blur(8px) saturate(1.06);
+    /* 深海暗色 + 微光星尘，突出弹窗并契合守岸人基调 */
+    background: linear-gradient(
+      180deg,
+      rgba(2, 10, 16, 0.78),
+      rgba(3, 18, 28, 0.62)
+    );
+    backdrop-filter: blur(10px) saturate(1.08);
+    -webkit-backdrop-filter: blur(10px) saturate(1.08);
 
-    /* 在 overlay 顶层加一层微弱的红色晕染（视觉氛围） */
+    /* 顶层冷色光晕，轻微星尘纹理 */
     &::after {
       content: "";
       position: absolute;
       inset: 0;
       pointer-events: none;
-      background: radial-gradient(600px 240px at 50% 30%, rgba(158, 24, 32, 0.06), transparent 15%);
+      background: radial-gradient(
+          700px 260px at 50% 28%,
+          rgba(60, 160, 200, 0.06),
+          transparent 16%
+        ),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.24), transparent 40%);
       mix-blend-mode: screen;
     }
   }
 
-  /* 弹窗主体（红椿化） */
   .upload-modal {
-    background: linear-gradient(180deg,
-        rgba(255, 246, 247, 0.98),
-        rgba(255, 240, 241, 0.96));
-    padding: 36px;
-    border-radius: 18px;
-    width: 660px;
-    color: #2b1516;
-    /* 深色文本，保证可读性 */
-    box-shadow:
-      0 28px 80px rgba(150, 26, 34, 0.42),
-      0 8px 28px rgba(190, 90, 110, 0.06);
-    border: 1px solid rgba(158, 24, 32, 0.06);
     position: relative;
-    font-family: "Helvetica Neue", "Noto Sans SC", "PingFang SC", sans-serif;
+    width: 720px; /* 略宽以容纳内容 */
+    max-width: calc(100% - 40px);
+    padding: 36px;
+    border-radius: 16px;
     overflow: hidden;
+    z-index: 2100;
+    color: #e6fbff;
+    font-family: "Helvetica Neue", "Noto Sans SC", "PingFang SC", sans-serif;
     -webkit-font-smoothing: antialiased;
 
-    /* 外发光（霓虹边） */
+    /* 背景：半透明深蓝毛玻璃，内侧有冰蓝高光 */
+    background: linear-gradient(
+      180deg,
+      rgba(6, 28, 40, 0.82),
+      rgba(4, 20, 30, 0.78)
+    );
+    border: 1px solid rgba(110, 200, 255, 0.06);
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    box-shadow: 0 30px 90px rgba(0, 10, 16, 0.72),
+      inset 0 1px 0 rgba(255, 255, 255, 0.02);
+
+    /* 冰晶外发光边（伪元素） */
     &::before {
       content: "";
       position: absolute;
       inset: -2px;
-      border-radius: 20px;
-      background: linear-gradient(90deg,
-          rgba(255, 179, 186, 0.18),
-          rgba(158, 24, 32, 0.12));
-      filter: blur(18px);
-      opacity: 0.95;
+      border-radius: 18px;
       pointer-events: none;
+      background: linear-gradient(
+        90deg,
+        rgba(110, 200, 255, 0.08),
+        rgba(30, 120, 160, 0.06),
+        rgba(110, 200, 255, 0.06)
+      );
+      filter: blur(14px);
       mix-blend-mode: screen;
+      opacity: 0.95;
     }
 
     /* 标题 */
     h3 {
-      margin-bottom: 16px;
-      font-size: 1.6rem;
-      color: #9e1820;
-      /* 椿的深红 */
+      margin: 0 0 16px 0;
+      font-size: 1.5rem;
+      color: #bff7ff;
+      font-weight: 900;
       text-align: center;
-      font-weight: 800;
       letter-spacing: 0.6px;
-      /* 温和的内外发光，突出主题感 */
-      text-shadow:
-        0 2px 10px rgba(158, 24, 32, 0.12),
-        0 0 18px rgba(255, 119, 134, 0.06);
+      text-shadow: 0 6px 20px rgba(0, 40, 60, 0.3);
     }
 
+    /* 统计文字 */
     .stats {
-      margin: 20px 0;
+      margin: 18px 0;
       font-size: 1rem;
       text-align: center;
+      color: rgba(190, 245, 255, 0.95);
 
       strong {
-        color: #b83a4a;
+        color: #86f0ff;
       }
     }
 
-    /* tip 区块改为暖粉玻璃并加深左侧强调线 */
+    /* tip 区块：深海玻璃 + 左侧冰蓝强调线 */
     .tip-container {
-      margin-top: 20px;
+      margin-top: 18px;
       padding: 14px 18px;
-      background: linear-gradient(180deg,
-          rgba(255, 245, 246, 0.88),
-          rgba(255, 240, 241, 0.86));
-      border-left: 4px solid rgba(158, 24, 32, 0.12);
+      background: linear-gradient(
+        180deg,
+        rgba(8, 36, 48, 0.42),
+        rgba(6, 30, 40, 0.36)
+      );
+      border-left: 4px solid rgba(110, 200, 255, 0.12);
       border-radius: 10px;
       backdrop-filter: blur(4px);
-      color: #2a2a2a;
+      color: rgba(210, 240, 255, 0.94);
 
       .tips-list {
         list-style: none;
@@ -1010,22 +1080,24 @@ $neon-pink: #ff66c4;
           padding-left: 34px;
           margin-bottom: 10px;
           font-size: 0.95rem;
-          color: #2a2a2a;
+          color: rgba(200, 235, 245, 0.95);
 
           &::before {
             content: "";
             position: absolute;
-            left: 6px;
-            top: 6px;
-            width: 18px;
-            height: 18px;
+            left: 8px;
+            top: 8px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            background: radial-gradient(circle at 35% 30%,
-                #fff7f8 0%,
-                rgba(255, 255, 255, 0.7) 10%,
-                #ff9aa6 38%,
-                #9e1820 100%);
-            box-shadow: 0 4px 10px rgba(158, 24, 32, 0.08);
+            background: radial-gradient(
+              circle at 30% 30%,
+              #e6ffff 0%,
+              rgba(190, 245, 255, 0.85) 10%,
+              #7be8ff 40%,
+              #2aa7c7 100%
+            );
+            box-shadow: 0 6px 18px rgba(40, 160, 200, 0.08);
           }
 
           &:last-child {
@@ -1039,41 +1111,53 @@ $neon-pink: #ff66c4;
       margin-top: 10px;
       text-align: right;
       font-size: 0.9rem;
-      color: #3a2a2b;
+      color: rgba(170, 210, 225, 0.9);
     }
 
-    /* 表单控件 */
+    /* 表单控件：深色输入框 + 冰蓝高光（聚焦时发光） */
     label {
       display: block;
       margin-bottom: 18px;
       font-size: 0.95rem;
-      color: #2b2b2b;
+      color: rgba(200, 235, 245, 0.95);
 
       input[type="text"],
-      input[type="file"] {
+      input[type="file"],
+      textarea {
         width: 100%;
         margin-top: 8px;
-        padding: 10px 12px;
+        padding: 12px 14px;
         border-radius: 10px;
-        border: 1px solid rgba(180, 140, 145, 0.10);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 246, 247, 0.96));
-        color: #2b1516;
+        border: 1px solid rgba(110, 200, 255, 0.06);
+        background: linear-gradient(
+          180deg,
+          rgba(3, 18, 26, 0.6),
+          rgba(6, 30, 40, 0.64)
+        );
+        color: rgba(210, 245, 255, 0.96);
         font-size: 0.95rem;
         outline: none;
-        transition: border-color 0.18s, box-shadow 0.18s, transform 0.12s;
+        transition: border-color 0.18s ease, box-shadow 0.18s ease,
+          transform 0.12s ease;
+        box-shadow: inset 0 -4px 10px rgba(0, 0, 0, 0.4);
+      }
+
+      input[type="text"]::placeholder,
+      textarea::placeholder {
+        color: rgba(180, 220, 235, 0.6);
       }
 
       input[type="text"]:focus,
-      input[type="file"]:focus {
-        border-color: rgba(255, 123, 144, 0.9);
-        box-shadow:
-          0 8px 26px rgba(184, 58, 74, 0.08),
-          0 2px 8px rgba(255, 160, 170, 0.06);
+      input[type="file"]:focus,
+      textarea:focus {
+        border-color: rgba(110, 200, 255, 0.36);
+        box-shadow: 0 12px 36px rgba(40, 140, 180, 0.08),
+          0 2px 8px rgba(90, 200, 230, 0.04);
         transform: translateY(-1px);
       }
     }
 
-    /* 按钮行（主/取消） */
+    /* 按钮行（主/取消）：冰蓝主按钮 + 次要透明样式 */
     .modal-actions {
       display: flex;
       justify-content: flex-end;
@@ -1087,110 +1171,125 @@ $neon-pink: #ff66c4;
         border: none;
         border-radius: 24px;
         cursor: pointer;
-        font-weight: 700;
+        font-weight: 800;
         font-size: 0.95rem;
-        transition: background 0.22s ease, box-shadow 0.22s ease, transform 0.12s;
+        transition: background 0.22s ease, box-shadow 0.22s ease,
+          transform 0.12s ease;
         min-width: 96px;
-        color: #fff;
+        color: #01292e;
       }
 
-      /* 主按钮：椿粉 -> 深红 渐变 */
+      /* 主按钮：冰蓝渐变（可用 .primary 类或非 .cancel） */
       button:not(.cancel) {
-        background: linear-gradient(135deg, #ff8aa2 0%, #d94e60 60%, #9e1820 100%);
-        box-shadow:
-          0 12px 36px rgba(184, 58, 74, 0.14),
-          0 4px 18px rgba(158, 24, 32, 0.06);
+        background: linear-gradient(
+          135deg,
+          #bff7ff 0%,
+          #66dff0 55%,
+          #2aa7c7 100%
+        );
+        box-shadow: 0 12px 36px rgba(20, 110, 140, 0.12),
+          0 4px 18px rgba(40, 120, 160, 0.06);
+        color: #002a32;
       }
 
       button:not(.cancel):hover:not(:disabled) {
         transform: translateY(-4px);
-        box-shadow:
-          0 20px 56px rgba(184, 58, 74, 0.2),
-          0 8px 28px rgba(158, 24, 32, 0.08);
+        box-shadow: 0 22px 66px rgba(10, 60, 80, 0.28),
+          0 8px 28px rgba(80, 200, 240, 0.08);
       }
 
       button:not(.cancel):disabled {
-        background: linear-gradient(135deg, rgba(255, 138, 154, 0.18), rgba(185, 130, 140, 0.18));
+        background: linear-gradient(
+          135deg,
+          rgba(130, 200, 220, 0.08),
+          rgba(80, 160, 190, 0.06)
+        );
         opacity: 0.6;
         cursor: not-allowed;
         box-shadow: none;
-        color: #fff;
+        color: rgba(180, 230, 240, 0.6);
       }
 
-      /* 取消按钮：透明边框风格 */
+      /* 取消按钮：半透明边框风格 */
       button.cancel {
         background: transparent;
-        border: 2px solid rgba(158, 24, 32, 0.08);
-        color: #591e22;
+        border: 2px solid rgba(110, 200, 255, 0.06);
+        color: rgba(180, 230, 240, 0.9);
         min-width: 86px;
+        box-shadow: inset 0 -4px 8px rgba(0, 0, 0, 0.22);
       }
 
       button.cancel:hover {
-        background: rgba(158, 24, 32, 0.04);
+        background: rgba(110, 200, 255, 0.04);
       }
     }
-
   }
-
 
   .ranking-panel {
     width: 220px;
     padding: 16px;
-    /* 红椿渐变毛玻璃面板（写死颜色） */
-    background: linear-gradient(160deg,
-        rgba(255, 238, 241, 0.88),
-        rgba(255, 232, 234, 0.84));
-    -webkit-backdrop-filter: blur(10px) saturate(120%);
-    backdrop-filter: blur(10px) saturate(120%);
-    border-radius: 18px;
-    border: 1px solid rgba(158, 24, 32, 0.08);
-    box-shadow: 0 10px 30px rgba(158, 24, 32, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4);
     position: fixed;
     top: 84px;
     right: 12px;
-    color: #ffffff;
+    z-index: 1200;
+    color: #e6fbff;
     font-family: "PingFang SC", "Noto Sans SC", "Helvetica Neue", Arial,
       sans-serif;
-    z-index: 1200;
+
+    /* 深海毛玻璃基底 + 晶体光晕 */
+    background: linear-gradient(
+      180deg,
+      rgba(4, 22, 34, 0.78),
+      rgba(6, 38, 54, 0.72)
+    );
+    border-radius: 18px;
+    border: 1px solid rgba(110, 200, 255, 0.06);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    backdrop-filter: blur(10px) saturate(120%);
+    box-shadow: 0 14px 40px rgba(0, 12, 20, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.02);
 
     &.collapsed {
       height: auto;
       padding-bottom: 8px;
     }
 
+    /* panel header */
     .panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      cursor: pointer;
       gap: 8px;
+      cursor: pointer;
+      user-select: none;
 
       .ranking-title {
-        font-size: 1.15rem;
-        font-weight: 800;
-        color: #9e1820;
-        /* 深椿红 */
-        font-family: "Zhi Mang Xing", "STKaiti", serif;
         margin: 0;
-        /* 轻微外发光，提升质感 */
-        text-shadow: 0 2px 12px rgba(158, 24, 32, 0.08);
+        font-size: 1.05rem;
+        font-weight: 900;
+        color: #bff7ff; /* 冰蓝高光 */
+        font-family: "Zhi Mang Xing", "STKaiti", serif;
+        letter-spacing: 0.6px;
+        text-shadow: 0 6px 18px rgba(10, 80, 110, 0.18);
       }
 
       .toggle-icon {
         font-size: 1rem;
-        color: #9e1820;
-        user-select: none;
-        background: linear-gradient(180deg,
-            rgba(255, 243, 244, 0.9),
-            rgba(255, 238, 239, 0.8));
+        color: #bff7ff;
+        background: linear-gradient(
+          180deg,
+          rgba(12, 40, 52, 0.5),
+          rgba(10, 30, 40, 0.36)
+        );
         padding: 6px 8px;
-        border-radius: 8px;
-        border: 1px solid rgba(158, 24, 32, 0.06);
-        box-shadow: 0 6px 14px rgba(158, 24, 32, 0.04);
+        border-radius: 9px;
+        border: 1px solid rgba(110, 200, 255, 0.06);
+        box-shadow: 0 6px 14px rgba(0, 12, 20, 0.45),
+          inset 0 1px 0 rgba(255, 255, 255, 0.02);
       }
     }
 
+    /* 列表容器 */
     .ranking-list {
       list-style: none;
       padding: 0;
@@ -1198,136 +1297,160 @@ $neon-pink: #ff66c4;
       overflow-y: auto;
       max-height: 55vh;
 
-      .ranking-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 8px 10px;
-        margin-bottom: 8px;
-        border-radius: 12px;
-        background: linear-gradient(180deg,
-            rgba(255, 255, 255, 0.9),
-            rgba(255, 248, 249, 0.95));
-        border: 1px solid rgba(245, 235, 238, 0.7);
-        transition: transform 240ms cubic-bezier(0.2, 0.9, 0.25, 1),
-          background 240ms ease, box-shadow 240ms ease, color 200ms ease;
-       
+      /* 自定义滚动条（深海风） */
+      &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: linear-gradient(
+          180deg,
+          rgba(80, 180, 210, 0.16),
+          rgba(60, 140, 170, 0.12)
+        );
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.02);
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+    }
 
-        &:hover {
-          transform: translateY(-4px);
-          background: linear-gradient(90deg,
-              rgba(255, 240, 242, 0.98),
-              rgba(255, 230, 232, 0.98));
-          box-shadow: 0 10px 30px rgba(158, 24, 32, 0.06);
-        }
+    .ranking-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      border-radius: 12px;
+
+      /* 半透明深色卡片 + 细晶体高光 */
+      background: linear-gradient(
+        180deg,
+        rgba(8, 30, 40, 0.48),
+        rgba(6, 26, 34, 0.42)
+      );
+      border: 1px solid rgba(100, 180, 220, 0.04);
+      transition: transform 260ms cubic-bezier(0.2, 0.9, 0.3, 1),
+        box-shadow 260ms ease, background 260ms ease, color 200ms ease;
+
+      &:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 52px rgba(0, 12, 20, 0.6),
+          0 0 30px rgba(70, 180, 210, 0.06);
+        background: linear-gradient(
+          90deg,
+          rgba(10, 40, 52, 0.62),
+          rgba(8, 34, 48, 0.58)
+        );
+      }
+
+      .rank {
+        width: 36px;
+        text-align: center;
+        font-weight: 900;
+        font-size: 1rem;
+        color: #8ee8ff; /* 冰蓝 */
+        text-shadow: 0 2px 8px rgba(0, 40, 60, 0.24);
+        flex-shrink: 0;
+      }
+
+      .name {
+        flex: 1;
+        padding: 0 8px;
+        font-size: 0.95rem;
+        color: #dff8ff;
+        font-weight: 700;
+        white-space: normal; /* 允许换行 */
+        word-break: break-word;
+        line-height: 1.25;
+      }
+
+      .count {
+        font-size: 0.9rem;
+        color: #9eeeff;
+        font-weight: 800;
+        min-width: 36px;
+        text-align: right;
+        text-shadow: 0 2px 6px rgba(0, 30, 40, 0.2);
+        flex-shrink: 0;
+      }
+
+      /* ---------- 前三名强化（晶体光辉） ---------- */
+      &.rank-1 {
+        background: linear-gradient(
+          135deg,
+          #a9f3ff 0%,
+          #64dff0 50%,
+          #2aa7c7 100%
+        );
+        color: #022a32;
+        border: 1px solid rgba(20, 110, 140, 0.22);
+        box-shadow: 0 18px 60px rgba(20, 90, 120, 0.32),
+          0 0 30px rgba(100, 200, 255, 0.08);
 
         .rank {
-          width: 36px;
-          text-align: center;
-          font-weight: 900;
-          font-size: 1rem;
-          color: #b82d3b;
-          /* 鲜明红 */
-          text-shadow: 0 2px 8px rgba(184, 58, 74, 0.12);
+          color: #002a32;
+          text-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
         }
-
         .name {
-          flex: 1;
-          padding: 0 8px;
-          font-size: 0.95rem;
-          color: #4b1a20;
-          font-weight: 700;
-          white-space: normal; // 允许换行
-          word-break: break-word; // 长单词/连续字符也能断开
-          line-height: 1.3; // 行高适配换行
+          color: #002a32;
         }
-
         .count {
-          font-size: 0.9rem;
-          color: #9e1820;
-          font-weight: 800;
-          text-shadow: 0 2px 8px rgba(158, 24, 32, 0.06);
-          min-width: 36px;
-          text-align: right;
+          color: #002a32;
         }
+      }
 
-        /* ---- 前三名强化样式 ---- */
-        &.rank-1 {
-          background: linear-gradient(135deg,
-              #ffb3b9 0%,
-              #ff4f4f 60%,
-              #9e1820 100%);
-          color: #fff;
-          box-shadow: 0 10px 36px rgba(158, 24, 32, 0.14),
-            0 0 18px rgba(255, 79, 79, 0.08);
-          border: 1px solid #9e1820;
+      &.rank-2 {
+        background: linear-gradient(
+          135deg,
+          #cdeff6 0%,
+          #78dff0 55%,
+          #2c9fb8 100%
+        );
+        color: #01282e;
+        border: 1px solid rgba(20, 100, 140, 0.16);
+        box-shadow: 0 14px 48px rgba(14, 70, 90, 0.28);
 
-          .rank {
-            color: #fff;
-            text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
-          }
-
-          .name {
-            color: #fff;
-          }
-
-          .count {
-            color: #fff;
-          }
+        .rank {
+          color: #022a32;
         }
-
-        &.rank-2 {
-          background: linear-gradient(135deg,
-              #ffd6da 0%,
-              #ff7b90 60%,
-              #8b141c 100%);
-          color: #fff;
-          box-shadow: 0 8px 28px rgba(158, 24, 32, 0.12);
-          border: 1px solid #8b141c;
-
-          .rank {
-            color: #fff;
-          }
-
-          .name {
-            color: #fff;
-          }
-
-          .count {
-            color: #fff;
-          }
+        .name {
+          color: #e8fbff;
         }
+        .count {
+          color: #cfeffc;
+        }
+      }
 
-        &.rank-3 {
-          background: linear-gradient(135deg,
-              #ffecec 0%,
-              #ff9aa6 60%,
-              #7a1318 100%);
-          color: #fff;
-          box-shadow: 0 6px 22px rgba(158, 24, 32, 0.1);
-          border: 1px solid #7a1318;
+      &.rank-3 {
+        background: linear-gradient(
+          135deg,
+          rgba(180, 235, 245, 0.12) 0%,
+          rgba(120, 200, 220, 0.18) 60%,
+          rgba(60, 140, 170, 0.22) 100%
+        );
+        color: #dff8ff;
+        border: 1px solid rgba(80, 160, 190, 0.08);
+        box-shadow: 0 10px 36px rgba(8, 40, 60, 0.26);
 
-          .rank {
-            color: #fff;
-          }
-
-          .name {
-            color: #fff;
-          }
-
-          .count {
-            color: #fff;
-          }
+        .rank {
+          color: #bff7ff;
+        }
+        .name {
+          color: #dff8ff;
+        }
+        .count {
+          color: #bff7ff;
         }
       }
     }
 
-    /* 淡入淡出动画（保留） */
+    /* 淡入淡出（保留原过渡类） */
     .fade-enter-active,
     .fade-leave-active {
       transition: opacity 0.28s ease;
     }
-
     .fade-enter-from,
     .fade-leave-to {
       opacity: 0;

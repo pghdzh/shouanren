@@ -32,8 +32,8 @@ const navItems = [
   { name: "潮铭·寄愿", path: "/message" }, // 留言板 — 将愿望刻为潮铭，适合涟漪留言动效
   { name: "岸影典藏", path: "/gallery" },  // 图集 — 「岸影」与「典藏」，更有珍藏感
   { name: "织典·器匣", path: "/resources" },// 资源分享 — 织物/器匣意象，适配资料库与素材下载
-  { name: "潮祭·日祷", path: "/game" },    // 祈福 — 仪式感更强的命名，可做日历/签到类交互
-  { name: "回音馆·泠语", path: "/voice" }, // 语音馆 — 回声与低语，适合波形/共鸣动画
+  // { name: "潮祭·日祷", path: "/game" },    // 祈福 — 仪式感更强的命名，可做日历/签到类交互
+  // { name: "回音馆·泠语", path: "/voice" }, // 语音馆 — 回声与低语，适合波形/共鸣动画
 ]
 
 
@@ -48,7 +48,7 @@ const siteId = 'shouanren'
 const onlineCount = ref<number | null>(null)
 
 // 连接时带上 query.siteId
-const socket: Socket = io('http://1.94.189.79:3000', {
+const socket: any = io('http://1.94.189.79:3000', {
   query: { siteId }
 })
 

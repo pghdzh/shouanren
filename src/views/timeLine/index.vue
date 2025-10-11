@@ -6,7 +6,13 @@
         <div class="left-col">
           <button class="avatar-card">
             <picture class="avatar-wrap">
-              <img src="@/assets/images1/slty1 (8).webp" alt="守岸人 头像" class="avatar" loading="lazy" decoding="async" />
+              <img
+                src="@/assets/images1/slty1 (8).webp"
+                alt="守岸人 头像"
+                class="avatar"
+                loading="lazy"
+                decoding="async"
+              />
             </picture>
             <div class="avatar-meta">
               <span class="avatar-badge">共鸣能力：叙响织构</span>
@@ -18,7 +24,9 @@
             <h1 class="name">
               守岸人 <span class="jp">（黑海岸的守望者）</span>
             </h1>
-            <p class="subtitle">回声为灯，潮汐为路，她在黑海岸静守每一个迷途的誓言。</p>
+            <p class="subtitle">
+              回声为灯，潮汐为路，她在黑海岸静守每一个迷途的誓言。
+            </p>
             <p class="lead">
               神秘清冷、超然物外。她因你的唤醒而生，在漫长的守望中萌生出情感和渴望——守护与世界，与你之间的羁绊。
             </p>
@@ -32,13 +40,24 @@
           <h2>核心机制</h2>
         </div>
         <ul class="traits">
-          <li>【实论数据】：角色血量上方上限为5的特殊能量条，达到上限后施放重击演绎或空中攻击衍变消耗全部【实论数据】。</li>
-          <li>【星域】：施放共鸣解放终末回环展开的领域。根据队伍中使用变奏技能的次数，变为不同的星域：浅析星域（蓝色）→ 深潜星域（紫色）→
-            解限星域（金色），累计获得回血／暴击提升／暴伤提升的效果。在解限星域中施放变奏技能时会替换成洞悉。需要守岸人拥有 250% 共鸣效率才能获得最高收益。</li>
-          <li style="font-weight: bold;">输出流程：</li>
+          <li>
+            【实论数据】：角色血量上方上限为5的特殊能量条，达到上限后施放重击演绎或空中攻击衍变消耗全部【实论数据】。
+          </li>
+          <li>
+            【星域】：施放共鸣解放终末回环展开的领域。根据队伍中使用变奏技能的次数，变为不同的星域：浅析星域（蓝色）→
+            深潜星域（紫色）→
+            解限星域（金色），累计获得回血／暴击提升／暴伤提升的效果。在解限星域中施放变奏技能时会替换成洞悉。需要守岸人拥有
+            250% 共鸣效率才能获得最高收益。
+          </li>
+          <li style="font-weight: bold">输出流程：</li>
           <li>基础流程：A-A-A-A-Z —（可切人）— A-A-A-A-Z-E-Q-R</li>
-          <li>守岸人闪避反击收益极高，蹭到一个或两个闪第二段可以直接 E-Q-R 启动，EQR 大致有四分之一的协奏圈。</li>
-          <li>技能缩写：普攻 = A，重击 = Z，共鸣技能 = E，共鸣解放 = R，声骸 = Q</li>
+          <li>
+            守岸人闪避反击收益极高，蹭到一个或两个闪第二段可以直接 E-Q-R
+            启动，EQR 大致有四分之一的协奏圈。
+          </li>
+          <li>
+            技能缩写：普攻 = A，重击 = Z，共鸣技能 = E，共鸣解放 = R，声骸 = Q
+          </li>
         </ul>
       </section>
 
@@ -77,6 +96,30 @@
       </section>
 
       <!-- 新增三大主题区域 -->
+      <section id="food" class="card special-section">
+        <div class="card-head">
+          <h2>雪烩浓汤</h2>
+        </div>
+        <div class="content two-col">
+          <div class="img-area">
+            <!-- 预留图片插槽 -->
+            <img
+              src="./img/food.webp"
+              alt="雪烩浓汤"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div class="text-block">
+            <p>
+              守岸人喜欢的一种浓汤，不需要什么昂贵特殊的食材，直接用沿岸现有的海鲜就能做成，秘诀在于醇厚的牛奶和炖煮得够久的时间。
+            </p>
+            <p>
+              鲜少有人知道的是，这是守岸人为了复制记忆中那人带来的温度所做。她按照相同做法和步骤，却在一次次的尝试中，摸索出自己的味道。现煮的浓汤带有海鲜的鲜甜，佐以烤好的面包片，一碗下去，热意向四肢百骸蔓延……或许，这就是那人曾告诉她的简单却扎实的幸福感。
+            </p>
+          </div>
+        </div>
+      </section>
       <section id="shattered-crystal" class="card special-section">
         <div class="card-head">
           <h2>陨坏死星</h2>
@@ -84,12 +127,15 @@
         <div class="content two-col">
           <div class="img-area">
             <!-- 预留图片插槽 -->
-            <img src="./img/item1.webp" alt="陨坏死星" loading="lazy" decoding="async" />
+            <img
+              src="./img/item1.webp"
+              alt="陨坏死星"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
           <div class="text-block">
-            <p>
-              从守岸人体内剥离出的碎裂晶体，此时因能量耗尽而呈现死寂状态。
-            </p>
+            <p>从守岸人体内剥离出的碎裂晶体，此时因能量耗尽而呈现死寂状态。</p>
             <p>
               浪潮褪去，群星给出了自己的答案，守岸人也决定面对应尽的使命。以身为介，不断重演的悲鸣几乎使她摧折。她将黯淡失色的部分从体内剥离，又捕获全新的回音，凝成晶体，填补自身的缺口。
             </p>
@@ -104,7 +150,15 @@
         <div class="card-head">
           <h2>周期时计</h2>
         </div>
-        <div class="content two-col reverse">
+        <div class="content two-col">
+          <div class="img-area">
+            <img
+              src="./img/item2.webp"
+              alt="周期时计"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
           <div class="text-block">
             <p>
               黑海岸地下，群星在永无止息的夜空高悬，时间流转，却没有四季的分别。为使正流逝的一切更容易被实际感知，漂泊者仿照沙漏外形制作了这款自运行的计时装置，赠予守岸人。
@@ -112,9 +166,6 @@
             <p>
               装置运行无需手动倒转，内里的能量介质会以42天为周期，在一上一下的对称结构中回旋跌宕、循环往复。42天，足够装置透过杯壁展示一场兴盛与湮灭的交替，正对应泰缇斯系统进行一次完形、推演的标准周期。漂泊者以“42”这一包含了有限与无限集合的数字，在守岸人的漫长使命手动划下句点，为她的等待提供些许慰藉。
             </p>
-          </div>
-          <div class="img-area">
-            <img src="./img/item2.webp" alt="周期时计" loading="lazy" decoding="async" />
           </div>
         </div>
       </section>
@@ -125,12 +176,15 @@
         </div>
         <div class="content two-col">
           <div class="img-area">
-            <img src="./img/item3.webp" alt="我们 唱片" loading="lazy" decoding="async" />
+            <img
+              src="./img/item3.webp"
+              alt="我们 唱片"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
           <div class="text-block">
-            <p>
-              一张由附有回音能量的介质制成的唱片，有着近乎无限的存储空间。
-            </p>
+            <p>一张由附有回音能量的介质制成的唱片，有着近乎无限的存储空间。</p>
             <p>
               唱片收录了守岸人能搜集到的所有这颗星球的声音，风雨雷雪、鸟鸣鲸歌，来自不同年代的音乐，已知超过50种语言的元音字句……发声是存在留下的痕迹，亦是存在本身，它们代表着这颗星球上有或曾有过的生命、科学和文明。
             </p>
@@ -141,17 +195,27 @@
         </div>
       </section>
 
-      <section id="timeline" class="card timeline" aria-labelledby="timeline-heading">
+      <section
+        id="timeline"
+        class="card timeline"
+        aria-labelledby="timeline-heading"
+      >
         <div class="card-head">
           <h2 id="timeline-heading">共鸣链详解 · 提升</h2>
         </div>
         <div class="tl-wrap" role="list">
           <div class="vl" aria-hidden="true"></div>
           <ol class="tl-list">
-            <li v-for="(ev, i) in timeline" :key="i" class="tl-item" role="listitem" tabindex="0"
-              :aria-label="`第 ${i + 1} 链 · ${ev.title}`">
+            <li
+              v-for="(ev, i) in timeline"
+              :key="i"
+              class="tl-item"
+              role="listitem"
+              tabindex="0"
+              :aria-label="``"
+            >
               <div class="tl-card">
-                <h3 class="tl-title">{{ ev.title }}</h3>
+                <h3 class="tl-title">第 {{ i + 1 }} 链 · {{ ev.title }}</h3>
                 <p class="tl-desc">{{ ev.desc }}</p>
               </div>
             </li>
@@ -171,7 +235,7 @@ gsap.registerPlugin(ScrollTrigger);
 const timeline = ref([
   {
     title: "不语者假想",
-    desc: `共鸣解放终末回环展开的星域获得加强：治疗和增益效果范围 +150%，持续时间 +10 秒……`,
+    desc: `共鸣解放终末回环展开的星域获得加强：治疗和增益效果生效范围增加150%。持续时间增加10秒。施放变奏技能洞悉后不再结束星域。`,
   },
   {
     title: "夜幕的赠予与拒绝",
@@ -202,8 +266,16 @@ const reducedMotion =
 onMounted(() => {
   if (!reducedMotion) {
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-    tl.from(".avatar-card", { duration: 0.8, y: 18, opacity: 0, scale: 0.99 })
-      .from(".right-col > .hero-panel .name", { duration: 0.9, x: 24, opacity: 0 }, "-=0.45");
+    tl.from(".avatar-card", {
+      duration: 0.8,
+      y: 18,
+      opacity: 0,
+      scale: 0.99,
+    }).from(
+      ".right-col > .hero-panel .name",
+      { duration: 0.9, x: 24, opacity: 0 },
+      "-=0.45"
+    );
 
     gsap.utils.toArray(".tl-item").forEach((it: any, idx: number) => {
       gsap.from(it.querySelector(".tl-card"), {
@@ -238,7 +310,8 @@ onMounted(() => {
   min-height: 100vh;
   background: linear-gradient(135deg, #2a5f8f 0%, #487db2 60%, #8bbcd8 100%);
   /* 更偏向深海 — 渐变从深蓝到浅蓝 */
-  font-family: "Noto Sans SC", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  font-family: "Noto Sans SC", system-ui, -apple-system, "Segoe UI", Roboto,
+    Arial;
   color: #eef2f7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -277,7 +350,7 @@ onMounted(() => {
   }
 
   .avatar-card {
-    background: rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 12px;
     display: grid;
@@ -390,13 +463,19 @@ onMounted(() => {
 /* ========== 通用卡片 ========== */
 .card {
   margin-top: 24px;
-  background: rgba(0, 0, 0, 0.10);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 14px;
   padding: 24px;
-  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.30);
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(4px);
   color: #eef2f7;
   border: 1px solid rgba(255, 255, 255, 0.15);
+  
+  &:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45);
+    transition: transform 0.28s ease;
+  }
 
   h2 {
     margin: 0 0 12px 0;
@@ -446,10 +525,6 @@ onMounted(() => {
     margin-top: 16px;
   }
 
-  .content.reverse {
-    flex-direction: row-reverse;
-  }
-
   .img-area {
     flex: 0 0 200px;
 
@@ -457,7 +532,7 @@ onMounted(() => {
       width: 100%;
       height: auto;
       border-radius: 12px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.30);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
     }
   }
 
@@ -483,8 +558,13 @@ onMounted(() => {
     bottom: 20px;
     width: 4px;
     border-radius: 6px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-    box-shadow: 0 6px 18px rgba(255, 255, 255, 0.1), inset 0 0 10px rgba(255, 255, 255, 0.05);
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.1)
+    );
+    box-shadow: 0 6px 18px rgba(255, 255, 255, 0.1),
+      inset 0 0 10px rgba(255, 255, 255, 0.05);
     opacity: 0.9;
   }
 
@@ -510,7 +590,8 @@ onMounted(() => {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     width: calc(100% - 130px);
     border-left: 4px solid transparent;
-    transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+    transition: transform 0.28s ease, box-shadow 0.28s ease,
+      border-color 0.28s ease;
     position: relative;
     z-index: 2;
   }
@@ -560,7 +641,7 @@ onMounted(() => {
   }
 
   .subtitle {
-    font-size: 1.0rem;
+    font-size: 1rem;
   }
 
   .lead {
@@ -580,28 +661,34 @@ onMounted(() => {
     flex-direction: column;
   }
 
+  .timeline {
+    /* 取消可能的 overflow 隐藏 */
+    overflow: visible;
+  }
   .timeline .tl-wrap {
-    padding-left: 14px;
+    padding-left: 14px !important;
+    padding-right: 14px; /* 也给右边留出 padding */
+    /* 如果 tl-wrap 是 flex 子项，强制可压缩 */
+    min-height: 0;
   }
-
   .timeline .vl {
-    display: none;
+    display: none !important;
   }
-
-  .tl-item {
-    display: block;
-    margin: 14px 0;
+  .timeline .tl-list {
+    /* 保证列表不被挤出 */
+    overflow: visible;
   }
-
-  .tl-card {
+  .timeline .tl-item {
+    display: block !important;
+    margin: 14px 0 !important;
     width: 100%;
-    padding: 14px;
-    border-left: 0;
   }
-
-  .tl-item:hover .tl-card {
-    transform: none;
+  .timeline .tl-card {
+    width: 100% !important;
+    padding: 14px !important;
+    border-left: 0 !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    transform: none !important;
   }
 }
 </style>
