@@ -6,7 +6,11 @@
       当前在线：<span class="count">{{ onlineCount }}人</span>
     </div>
     <!-- 移动端汉堡按钮 -->
-    <button class="hamburger" @click="toggleMobileNav" aria-label="Toggle navigation">
+    <button
+      class="hamburger"
+      @click="toggleMobileNav"
+      aria-label="Toggle navigation"
+    >
       <span :class="{ open: mobileNavOpen }"></span>
       <span :class="{ open: mobileNavOpen }"></span>
       <span :class="{ open: mobileNavOpen }"></span>
@@ -14,53 +18,68 @@
 
     <!-- 普通导航 & 移动端下拉导航 -->
     <nav :class="['nav-links', { 'mobile-open': mobileNavOpen }]">
-      <RouterLink v-for="item in navItems" :key="item.name" :to="item.path" class="nav-item" active-class="active-link"
-        @click="mobileNavOpen = false">
+      <RouterLink
+        v-for="item in navItems"
+        :key="item.name"
+        :to="item.path"
+        class="nav-item"
+        active-class="active-link"
+        @click="mobileNavOpen = false"
+      >
         {{ item.name }}
       </RouterLink>
+
+      <a
+        href="http://slty.site/#/redirector"
+        target="_blank"
+        rel="noopener"
+        class="nav-item"
+        active-class="active-link"
+        @click="mobileNavOpen = false"
+      >
+        霜落映界
+      </a>
     </nav>
   </header>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { io } from 'socket.io-client'
+import { ref, onMounted, onBeforeUnmount } from "vue";
+import { io } from "socket.io-client";
 
 const navItems = [
-  { name: "潮息·守望", path: "/" },       // 首页 — 潮的呼吸与守望感，适合波纹或呼吸光效
+  { name: "潮息·守望", path: "/" }, // 首页 — 潮的呼吸与守望感，适合波纹或呼吸光效
   { name: "潮纹年谱", path: "/timeLine" }, // 人物简介 — 年谱/时间线感，像潮纹记录记忆
   { name: "潮铭·寄愿", path: "/message" }, // 留言板 — 将愿望刻为潮铭，适合涟漪留言动效
-  { name: "岸影典藏", path: "/gallery" },  // 图集 — 「岸影」与「典藏」，更有珍藏感
-  { name: "织典·器匣", path: "/resources" },// 资源分享 — 织物/器匣意象，适配资料库与素材下载
+  { name: "岸影典藏", path: "/gallery" }, // 图集 — 「岸影」与「典藏」，更有珍藏感
+  { name: "织典·器匣", path: "/resources" }, // 资源分享 — 织物/器匣意象，适配资料库与素材下载
   // { name: "潮祭·日祷", path: "/game" },    // 祈福 — 仪式感更强的命名，可做日历/签到类交互
   // { name: "回音馆·泠语", path: "/voice" }, // 语音馆 — 回声与低语，适合波形/共鸣动画
-]
+];
 
-
-const mobileNavOpen = ref(false)
+const mobileNavOpen = ref(false);
 function toggleMobileNav() {
-  mobileNavOpen.value = !mobileNavOpen.value
+  mobileNavOpen.value = !mobileNavOpen.value;
 }
 
+const siteId = "shouanren";
 
-const siteId = 'shouanren'
-
-const onlineCount = ref<number | null>(null)
+const onlineCount = ref<number | null>(null);
 
 // 连接时带上 query.siteId
-const socket: any = io('http://1.94.189.79:3000', {
-  query: { siteId }
-})
+const socket: any = io("http://1.94.189.79:3000", {
+  query: { siteId },
+});
 
 onMounted(() => {
-  socket.on('onlineCount', (count: number) => {
-    onlineCount.value = count
-  })
-})
+  socket.on("onlineCount", (count: number) => {
+    onlineCount.value = count;
+  });
+});
 
 onBeforeUnmount(() => {
-  socket.disconnect()
-})
+  socket.disconnect();
+});
 </script>
 
 <style scoped>
@@ -88,7 +107,8 @@ onBeforeUnmount(() => {
   padding: 0 40px;
   background: linear-gradient(180deg, var(--deep-bg), rgba(2, 12, 28, 0.6));
   backdrop-filter: blur(14px) saturate(1.05);
-  box-shadow: 0 6px 30px rgba(11, 30, 48, 0.45), 0 0 18px rgba(79, 233, 223, 0.06) inset;
+  box-shadow: 0 6px 30px rgba(11, 30, 48, 0.45),
+    0 0 18px rgba(79, 233, 223, 0.06) inset;
   border-bottom: 1px solid rgba(127, 191, 255, 0.06);
   animation: fadeInDown 0.6s ease-out both;
 }
@@ -117,15 +137,18 @@ onBeforeUnmount(() => {
   position: relative;
   margin-left: 16px;
   padding: 6px 14px;
-  font-family: 'Cinzel Decorative', serif;
+  font-family: "Cinzel Decorative", serif;
   font-size: 1rem;
   color: var(--muted-text);
-  background: linear-gradient(135deg, rgba(79, 233, 223, 0.04), rgba(127, 191, 255, 0.03));
+  background: linear-gradient(
+    135deg,
+    rgba(79, 233, 223, 0.04),
+    rgba(127, 191, 255, 0.03)
+  );
   border: 1px solid rgba(79, 233, 223, 0.12);
   border-radius: 24px;
   backdrop-filter: blur(6px);
-  box-shadow:
-    0 6px 20px rgba(3, 18, 38, 0.45),
+  box-shadow: 0 6px 20px rgba(3, 18, 38, 0.45),
     0 0 10px rgba(79, 233, 223, 0.06);
   overflow: hidden;
   cursor: default;
@@ -133,7 +156,7 @@ onBeforeUnmount(() => {
 }
 
 .online-count::before {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2px;
   left: -40%;
@@ -147,8 +170,7 @@ onBeforeUnmount(() => {
 
 .online-count:hover {
   transform: translateY(-2px);
-  box-shadow:
-    0 10px 30px rgba(3, 18, 38, 0.55),
+  box-shadow: 0 10px 30px rgba(3, 18, 38, 0.55),
     0 0 20px rgba(79, 233, 223, 0.08);
 }
 
@@ -188,8 +210,15 @@ onBeforeUnmount(() => {
   bottom: -6px;
   width: 0;
   height: 3px;
-  background: linear-gradient(90deg, transparent, var(--accent), var(--accent-2), transparent);
-  transition: width 0.36s cubic-bezier(.2, .9, .2, 1), left 0.36s cubic-bezier(.2, .9, .2, 1), opacity 0.28s;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent),
+    var(--accent-2),
+    transparent
+  );
+  transition: width 0.36s cubic-bezier(0.2, 0.9, 0.2, 1),
+    left 0.36s cubic-bezier(0.2, 0.9, 0.2, 1), opacity 0.28s;
   transform: translateX(-50%);
   opacity: 0.9;
   border-radius: 3px;
@@ -295,7 +324,11 @@ onBeforeUnmount(() => {
     left: 0;
     right: 0;
     flex-direction: column;
-    background: linear-gradient(180deg, rgba(2, 12, 28, 0.96), rgba(3, 18, 38, 0.98));
+    background: linear-gradient(
+      180deg,
+      rgba(2, 12, 28, 0.96),
+      rgba(3, 18, 38, 0.98)
+    );
     backdrop-filter: blur(12px);
     gap: 0;
     overflow: hidden;
@@ -332,6 +365,4 @@ onBeforeUnmount(() => {
 .title {
   animation: float-slow 8s ease-in-out infinite;
 }
-
-
 </style>
