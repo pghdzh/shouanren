@@ -41,7 +41,8 @@
     </section>
     <aside class="ranking-panel">
       <div class="panel-header" @click="expanded = !expanded">
-        <h3 class="ranking-title">排行榜</h3><span>共{{ imgTotal }}张</span>
+        <h3 class="ranking-title">排行榜</h3>
+        <span>共{{ imgTotal }}张</span>
         <span class="toggle-icon">{{ expanded ? "▾" : "▸" }}</span>
       </div>
       <transition name="fade">
@@ -119,10 +120,15 @@
       </div>
     </div>
 
-    <!-- <div class="floating-chibis">
-      <img v-for="(pet, i) in chibiList" :key="i" :src="pet.src" :style="{ top: pet.top + 'px', left: pet.left + 'px' }"
-        class="chibi-img" />
-    </div> -->
+    <div class="floating-chibis">
+      <img
+        v-for="(pet, i) in chibiList"
+        :key="i"
+        :src="pet.src"
+        :style="{ top: pet.top + 'px', left: pet.left + 'px' }"
+        class="chibi-img"
+      />
+    </div>
   </div>
 </template>
 
@@ -455,104 +461,107 @@ onMounted(async () => {
   if (sentinel.value) {
     sentinelObserver.observe(sentinel.value);
   }
-  // // 1. 基础配置信息
-  // const total = 9; // 总共 9 张图（编号 1～9）
-  // const pickCount = 3; // 每次抽取 3 张
-  // const vw = window.innerWidth;
-  // const vh = window.innerHeight;
+  // 1. 基础配置信息
+  const total = 9;
+  let pickCount = 3; // 每次抽取 3 张
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const isMobile = window.innerWidth <= 768;
+  // 如果已知单张小人图片的宽高，可避免超出边界；
+  // 假设小人图片宽 100px、高 100px，按需替换：
+  const imgWidth = 100;
+  const imgHeight = 100;
 
-  // // 如果已知单张小人图片的宽高，可避免超出边界；
-  // // 假设小人图片宽 100px、高 100px，按需替换：
-  // const imgWidth = 100;
-  // const imgHeight = 100;
+  // 2. Fisher–Yates 洗牌函数
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
 
-  // // 2. Fisher–Yates 洗牌函数
-  // function shuffle(array) {
-  //   for (let i = array.length - 1; i > 0; i--) {
-  //     const j = Math.floor(Math.random() * (i + 1));
-  //     [array[i], array[j]] = [array[j], array[i]];
-  //   }
-  //   return array;
-  // }
+  // 3. 随机选出 3 个编号
+  if (isMobile) {
+    pickCount = 1;
+  }
+  const nums = shuffle(Array.from({ length: total }, (_, k) => k + 1));
+  const picks = nums.slice(0, pickCount);
 
-  // // 3. 随机选出 3 个编号
-  // const nums = shuffle(Array.from({ length: total }, (_, k) => k + 1));
-  // const picks = nums.slice(0, pickCount);
+  // 4. 生成随机位置并填充 chibiList
+  chibiList.value = []; // 先清空
+  picks.forEach((i) => {
+    chibiList.value.push({
+      src: `/QImages/1 (${i}).png`,
+      left: Math.random() * (vw - imgWidth), // 保证不超出左右边界
+      top: Math.random() * (vh - imgHeight), // 保证不超出上下边界
+    });
+  });
 
-  // // 4. 生成随机位置并填充 chibiList
-  // chibiList.value = []; // 先清空
-  // picks.forEach((i) => {
-  //   chibiList.value.push({
-  //     src: `/QImages/1 (${i}).png`,
-  //     left: Math.random() * (vw - imgWidth), // 保证不超出左右边界
-  //     top: Math.random() * (vh - imgHeight), // 保证不超出上下边界
-  //   });
-  // });
+  // 2. 等 img 渲染到 DOM
+  await nextTick();
 
-  // // 2. 等 img 渲染到 DOM
-  // await nextTick();
+  // 3. 给每个小人绑定 GSAP 动画
+  const imgs = document.querySelectorAll<HTMLImageElement>(".chibi-img");
+  imgs.forEach((img, index) => {
+    const padding = 200; // 边缘预留空间
+    // ✅ 初始出场动画（闪现）
+    gsap.fromTo(
+      img,
+      { opacity: 0, scale: 0.5 },
+      {
+        opacity: 1,
+        scale: 1,
+        duration: 0.8,
+        ease: "back.out(2)",
+        delay: 0.2 * index,
+      }
+    );
 
-  // // 3. 给每个小人绑定 GSAP 动画
-  // const imgs = document.querySelectorAll<HTMLImageElement>(".chibi-img");
-  // imgs.forEach((img, index) => {
-  //   const padding = 200; // 边缘预留空间
-  //   // ✅ 初始出场动画（闪现）
-  //   gsap.fromTo(
-  //     img,
-  //     { opacity: 0, scale: 0.5 },
-  //     {
-  //       opacity: 1,
-  //       scale: 1,
-  //       duration: 0.8,
-  //       ease: "back.out(2)",
-  //       delay: 0.2 * index,
-  //     }
-  //   );
+    // ✅ 鼠标靠近闪避
+    img.addEventListener("mouseenter", () => {
+      gsap.killTweensOf(img);
 
-  //   // ✅ 鼠标靠近闪避
-  //   img.addEventListener("mouseenter", () => {
-  //     gsap.killTweensOf(img);
+      gsap.to(img, {
+        x: "+=" + ((Math.random() - 0.5) * 400).toFixed(0),
+        y: "+=" + ((Math.random() - 0.5) * 400).toFixed(0),
+        duration: 1.2,
+        ease: "back.out(2)",
+        onComplete: () => {
+          // 闪避完成后，再重新启用动画
+          animate(img);
+        },
+      });
+    });
 
-  //     gsap.to(img, {
-  //       x: "+=" + ((Math.random() - 0.5) * 400).toFixed(0),
-  //       y: "+=" + ((Math.random() - 0.5) * 400).toFixed(0),
-  //       duration: 1.2,
-  //       ease: "back.out(2)",
-  //       onComplete: () => {
-  //         // 闪避完成后，再重新启用动画
-  //         animate(img);
-  //       },
-  //     });
-  //   });
+    const animate = (img: HTMLImageElement) => {
+      let { x, y } = img.getBoundingClientRect();
+      let deltaX = (Math.random() - 0.5) * 200;
+      let deltaY = (Math.random() - 0.5) * 200;
 
-  //   const animate = (img: HTMLImageElement) => {
-  //     let { x, y } = img.getBoundingClientRect();
-  //     let deltaX = (Math.random() - 0.5) * 200;
-  //     let deltaY = (Math.random() - 0.5) * 200;
+      // 预测一下偏移后的位置
+      let nextX = x + deltaX;
+      let nextY = y + deltaY;
 
-  //     // 预测一下偏移后的位置
-  //     let nextX = x + deltaX;
-  //     let nextY = y + deltaY;
+      // 校正：防漂出左、右、上、下边界
+      if (nextX < padding) deltaX = padding - x;
+      if (nextX + img.width > window.innerWidth - padding)
+        deltaX = window.innerWidth - padding - (x + img.width);
+      if (nextY < padding) deltaY = padding - y;
+      if (nextY + img.height > window.innerHeight - padding)
+        deltaY = window.innerHeight - padding - (y + img.height);
 
-  //     // 校正：防漂出左、右、上、下边界
-  //     if (nextX < padding) deltaX = padding - x;
-  //     if (nextX + img.width > window.innerWidth - padding)
-  //       deltaX = window.innerWidth - padding - (x + img.width);
-  //     if (nextY < padding) deltaY = padding - y;
-  //     if (nextY + img.height > window.innerHeight - padding)
-  //       deltaY = window.innerHeight - padding - (y + img.height);
-
-  //     gsap.to(img, {
-  //       x: `+=${deltaX.toFixed(0)}`,
-  //       y: `+=${deltaY.toFixed(0)}`,
-  //       rotation: `+=${((Math.random() - 0.5) * 60).toFixed(0)}`,
-  //       duration: 2 + Math.random() * 2,
-  //       ease: "power1.inOut",
-  //       onComplete: () => animate(img),
-  //     });
-  //   };
-  //   animate(img);
-  // });
+      gsap.to(img, {
+        x: `+=${deltaX.toFixed(0)}`,
+        y: `+=${deltaY.toFixed(0)}`,
+        rotation: `+=${((Math.random() - 0.5) * 60).toFixed(0)}`,
+        duration: 2 + Math.random() * 2,
+        ease: "power1.inOut",
+        onComplete: () => animate(img),
+      });
+    };
+    animate(img);
+  });
 });
 
 onBeforeUnmount(() => {
