@@ -384,7 +384,6 @@ $glass: rgba(255, 255, 255, 0.02);
 
             .typed {
                 display: inline-block;
-                white-space: nowrap;
                 letter-spacing: 0.4px;
                 font-weight: 600;
             }
@@ -394,7 +393,7 @@ $glass: rgba(255, 255, 255, 0.02);
                 width: 12px;
                 height: 1.05em;
                 margin-left: 6px;
-              
+
                 animation: blink 1s steps(1) infinite;
                 transform: translateY(2px);
                 opacity: 0.95;
@@ -478,15 +477,17 @@ $glass: rgba(255, 255, 255, 0.02);
 
         .center {
             padding: 18px 14px;
+
+            .title {
+                font-size: 1.4rem;
+            }
+
+            .subtitle {
+                font-size: 0.98rem;
+            }
         }
 
-        .title {
-            font-size: 1.4rem;
-        }
 
-        .subtitle {
-            font-size: 0.98rem;
-        }
     }
 }
 </style>

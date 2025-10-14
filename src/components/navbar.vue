@@ -5,12 +5,19 @@
     <div class="online-count" v-if="onlineCount !== null">
       当前在线：<span class="count">{{ onlineCount }}人</span>
     </div>
+
+    <!-- 随机播放控件（在 logo 右侧） -->
+    <div class="player">
+      <div class="player__info" v-if="currentSongName">
+        <span class="player__song">{{ currentSongName }}</span>
+      </div>
+      <button @click="togglePlay" class="player__btn">
+        {{ playing ? '⏸️' : '▶️' }}
+      </button>
+      <button @click="playRandom" class="player__btn">🔀</button>
+    </div>
     <!-- 移动端汉堡按钮 -->
-    <button
-      class="hamburger"
-      @click="toggleMobileNav"
-      aria-label="Toggle navigation"
-    >
+    <button class="hamburger" @click="toggleMobileNav" aria-label="Toggle navigation">
       <span :class="{ open: mobileNavOpen }"></span>
       <span :class="{ open: mobileNavOpen }"></span>
       <span :class="{ open: mobileNavOpen }"></span>
@@ -18,25 +25,13 @@
 
     <!-- 普通导航 & 移动端下拉导航 -->
     <nav :class="['nav-links', { 'mobile-open': mobileNavOpen }]">
-      <RouterLink
-        v-for="item in navItems"
-        :key="item.name"
-        :to="item.path"
-        class="nav-item"
-        active-class="active-link"
-        @click="mobileNavOpen = false"
-      >
+      <RouterLink v-for="item in navItems" :key="item.name" :to="item.path" class="nav-item" active-class="active-link"
+        @click="mobileNavOpen = false">
         {{ item.name }}
       </RouterLink>
 
-      <a
-        href="http://slty.site/#/redirector"
-        target="_blank"
-        rel="noopener"
-        class="nav-item"
-        active-class="active-link"
-        @click="mobileNavOpen = false"
-      >
+      <a href="http://slty.site/#/redirector" target="_blank" rel="noopener" class="nav-item" active-class="active-link"
+        @click="mobileNavOpen = false">
         霜落映界
       </a>
     </nav>
@@ -44,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import { io } from "socket.io-client";
 
 const navItems = [
@@ -53,8 +48,10 @@ const navItems = [
   { name: "潮铭·寄愿", path: "/message" }, // 留言板 — 将愿望刻为潮铭，适合涟漪留言动效
   { name: "岸影典藏", path: "/gallery" }, // 图集 — 「岸影」与「典藏」，更有珍藏感
   { name: "织典·器匣", path: "/resources" }, // 资源分享 — 织物/器匣意象，适配资料库与素材下载
-  // { name: "潮祭·日祷", path: "/game" },    // 祈福 — 仪式感更强的命名，可做日历/签到类交互
-  // { name: "回音馆·泠语", path: "/voice" }, // 语音馆 — 回声与低语，适合波形/共鸣动画
+   { name: "潮愿·祈引", path: "/wish" }, // 资源分享 — 织物/器匣意象，适配资料库与素材下载
+   { name: "回音馆·泠语", path: "/voice" }, // 语音馆 — 回声与低语，适合波形/共鸣动画
+  { name: "潮祭·铭恩", path: "/thanks" },   
+ 
 ];
 
 const mobileNavOpen = ref(false);
@@ -71,6 +68,60 @@ const socket: any = io("http://1.94.189.79:3000", {
   query: { siteId },
 });
 
+
+// 音频播放器
+const audio = new Audio();
+audio.preload = 'auto';
+const playing = ref(false);
+const currentSong = ref<string | null>(null);
+
+// 从 public/songs 目录下的文件名列表（需在构建时或通过接口获取）
+const songList = [
+  '漂泊的终点(守岸人主题钢琴曲)-千里星寻.mp3',
+  '守岸人PV溯而复始-千里星寻.mp3',
+  '守岸人剧情告白EP-千里星寻.mp3',
+  '守岸人剧情告别EP-千里星寻.mp3',
+  '守岸人剧情结局主题曲-千里星寻.mp3'
+].map(name => `/songs/${name}`);
+
+// 随机播放
+
+function playRandom() {
+  const idx = Math.floor(Math.random() * songList.length);
+  currentSong.value = songList[idx];
+
+  audio.src = currentSong.value;
+  audio.play();
+  playing.value = true;
+}
+
+// 播放/暂停 切换
+function togglePlay() {
+  if (!currentSong.value) {
+    playRandom();
+  } else if (playing.value) {
+    audio.pause();
+    playing.value = false;
+  } else {
+    audio.play();
+    playing.value = true;
+  }
+}
+
+// 监听音频播放结束，自动下一曲
+audio.addEventListener('ended', () => {
+  playRandom();
+});
+
+
+
+const currentSongName = computed(() => {
+  if (!currentSong.value) return '';
+  const parts = currentSong.value.split('/');
+  return parts[parts.length - 1];
+});
+
+
 onMounted(() => {
   socket.on("onlineCount", (count: number) => {
     onlineCount.value = count;
@@ -82,7 +133,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .app-header {
   /* 主题色变量（便于统一调整） */
   --deep-bg: rgba(3, 18, 38, 0.72);
@@ -140,11 +191,9 @@ onBeforeUnmount(() => {
   font-family: "Cinzel Decorative", serif;
   font-size: 1rem;
   color: var(--muted-text);
-  background: linear-gradient(
-    135deg,
-    rgba(79, 233, 223, 0.04),
-    rgba(127, 191, 255, 0.03)
-  );
+  background: linear-gradient(135deg,
+      rgba(79, 233, 223, 0.04),
+      rgba(127, 191, 255, 0.03));
   border: 1px solid rgba(79, 233, 223, 0.12);
   border-radius: 24px;
   backdrop-filter: blur(6px);
@@ -185,6 +234,40 @@ onBeforeUnmount(() => {
   text-shadow: 0 0 8px rgba(79, 233, 223, 0.08);
 }
 
+/* 随机播放器样式 */
+.player {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 1.5rem;
+  backdrop-filter: blur(4px);
+
+  .player__info {
+    margin-right: 0.5rem;
+
+    .player__song {
+      color: #FFFFFF;
+      font-size: 0.875rem;
+    }
+  }
+
+  .player__btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    margin: 0 0.25rem;
+    cursor: pointer;
+    color: #FFFFFF;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
+
 /* 导航链接 */
 .nav-links {
   display: flex;
@@ -210,13 +293,11 @@ onBeforeUnmount(() => {
   bottom: -6px;
   width: 0;
   height: 3px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--accent),
-    var(--accent-2),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      var(--accent),
+      var(--accent-2),
+      transparent);
   transition: width 0.36s cubic-bezier(0.2, 0.9, 0.2, 1),
     left 0.36s cubic-bezier(0.2, 0.9, 0.2, 1), opacity 0.28s;
   transform: translateX(-50%);
@@ -324,11 +405,9 @@ onBeforeUnmount(() => {
     left: 0;
     right: 0;
     flex-direction: column;
-    background: linear-gradient(
-      180deg,
-      rgba(2, 12, 28, 0.96),
-      rgba(3, 18, 38, 0.98)
-    );
+    background: linear-gradient(180deg,
+        rgba(2, 12, 28, 0.96),
+        rgba(3, 18, 38, 0.98));
     backdrop-filter: blur(12px);
     gap: 0;
     overflow: hidden;

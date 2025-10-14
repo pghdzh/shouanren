@@ -27,12 +27,16 @@ const router = createRouter({
       component: () => import("@/views/resourcesView/index.vue"),
     },
     {
-      path: "/game",
-      component: () => import("@/views/gameView/index.vue"),
+      path: "/wish",
+      component: () => import("@/views/wishView/index.vue"),
     },
-     {
+    {
       path: "/voice",
       component: () => import("@/views/voiceView/index.vue"),
+    },
+    {
+      path: "/thanks",
+      component: () => import("@/views/thanksView/index.vue"),
     },
   ],
   scrollBehavior() {

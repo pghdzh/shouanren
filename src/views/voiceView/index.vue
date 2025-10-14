@@ -15,10 +15,25 @@
             <!-- header（只保留 logo + 标题/副标题） -->
             <header class="vg__header">
                 <div class="logo">
-                    <div class="ribbon" aria-hidden="true">🎀</div>
+                    <div class="icon-wrap" aria-hidden="true">
+                        <!-- 建议用一个回声 / 织纹风格的 SVG 图标替代 🎀 -->
+                        <svg width="56" height="56" viewBox="0 0 64 64" class="icon-soundmark" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="echoGrad" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#4fe9df" />
+                                    <stop offset="100%" stop-color="#66c8ff" />
+                                </linearGradient>
+                            </defs>
+                            <circle cx="32" cy="32" r="30" fill="#02131a" />
+                            <g fill="none" stroke="url(#echoGrad)" stroke-width="2" stroke-linecap="round">
+                                <path d="M16,32 C24,20 40,20 48,32" />
+                                <path d="M20,32 C26,24 38,24 44,32" opacity="0.7" />
+                            </g>
+                        </svg>
+                    </div>
                     <div class="title-group">
-                        <h1 class="title">珂莱塔 · 语音馆</h1>
-                        <p class="subtitle">收集并播放已触发的珂莱塔语音彩蛋。未解锁项会显示为锁定状态。</p>
+                        <h1 class="title">守岸人 · 语音馆</h1>
+                        <p class="subtitle">在无声之处，你的语句会被静静听见</p>
                     </div>
                 </div>
             </header>
@@ -63,7 +78,7 @@ import {
     Download
 } from '@element-plus/icons-vue'
 /* ================== 配置 ================== */
-const TOTAL_VOICES = 34; // 语音总数，按实际替换
+const TOTAL_VOICES = 30; // 语音总数，按实际替换
 const BG_INTERVAL_MS = 4500; // 背景切换间隔（毫秒）
 const MOBILE_BREAKPOINT = 720; // 小于这个宽度视为移动端
 /* ========================================= */
@@ -132,7 +147,7 @@ function loadUnlocked() {
 }
 
 /* 生成所有 id，并保持已解锁在前、未解锁在后 */
-const allIds = Array.from({ length: TOTAL_VOICES }, (_, i) => i + 1);
+const allIds = Array.from({ length: TOTAL_VOICES }, (_, i) => i);
 const allVoiceIds = computed(() => {
     const unlocked = Array.from(unlockedSet.value).filter(n => allIds.includes(n)).sort((a, b) => a - b);
     const locked = allIds.filter(id => !unlockedSet.value.has(id));
@@ -174,7 +189,7 @@ function onEnded() { isPlaying.value = false; /* 不自动下一条 */ }
 function onAudioError(e?: any) { console.error('audio error', e); isPlaying.value = false; }
 
 function voicePath(id: number) {
-    return `/gameAudio/audio (${id}).mp3`;
+    return `/voice/audio (${id}).mp3`;
 }
 function isUnlocked(id: number) {
     return unlockedSet.value.has(id);
@@ -321,7 +336,7 @@ $neon-pink: #ff66c4;
         display: flex;
         gap: 12px;
         align-items: center;
-        margin-bottom: 18px;
+        margin-bottom: 24px;
 
         .logo {
             display: flex;
@@ -334,33 +349,55 @@ $neon-pink: #ff66c4;
                 border-radius: 12px;
                 display: grid;
                 place-items: center;
-                font-size: 22px;
-                background: linear-gradient(135deg, #ff66c4, #b84f9a);
-                box-shadow: 0 8px 30px rgba(184, 79, 154, 0.22);
+                font-size: 24px;
+                /* 用一个“蝶印 / 回声印章”背景渐变 */
+                background: radial-gradient(circle at 35% 35%, #66c8ff, #0a2c3a 80%);
+                box-shadow: 0 8px 30px rgba(102, 200, 255, 0.22);
+                color: #def8ff;
+                border: 1px solid rgba(102, 200, 255, 0.12);
+                /* 轻微内阴影 + 伪光晕 */
+                position: relative;
+
+                &::before {
+                    content: '';
+                    position: absolute;
+                    inset: -4px;
+                    border-radius: 14px;
+                    background: radial-gradient(circle, rgba(79, 233, 223, 0.2), transparent 60%);
+                    filter: blur(8px);
+                    pointer-events: none;
+                }
             }
 
             .title-group {
+                display: flex;
+                flex-direction: column;
+
                 .title {
                     margin: 0;
-                    font-size: 1.35rem;
-                    background: linear-gradient(180deg, $ice-blue, $neon-pink);
+                    font-size: 1.5rem;
+                    font-weight: 800;
+                    /* 渐变填充 — 用冷青蓝渐变 */
+                    background: linear-gradient(90deg, #4fe9df 0%, #66c8ff 80%);
                     -webkit-background-clip: text;
                     background-clip: text;
                     color: transparent;
                     -webkit-text-fill-color: transparent;
-                    text-shadow: 0 10px 40px rgba($ice-blue, 0.06);
-                    font-weight: 800;
-                    letter-spacing: 0.6px;
+                    /* 给文字一个光晕／阴影提高可读性 */
+                    text-shadow: 0 8px 24px rgba(10, 40, 60, 0.4);
+                    letter-spacing: 0.5px;
                 }
 
                 .subtitle {
                     margin: 4px 0 0;
-                    color: #c2d6db;
-                    font-size: 0.95rem;
+                    color: rgba(207, 239, 246, 0.75);
+                    font-size: 1rem;
+                    line-height: 1.3;
                 }
             }
         }
     }
+
 
     /* 列表 */
     .vg__list {
@@ -401,24 +438,25 @@ $neon-pink: #ff66c4;
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        padding: 12px;
-        border-radius: 12px;
-        background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-        border: 1px solid rgba(255, 255, 255, 0.03);
-        transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: linear-gradient(90deg, rgba(38, 50, 61, 0.5), rgba(20, 28, 36, 0.6));
+        border: 1px solid rgba(118, 182, 210, 0.08);
+        backdrop-filter: blur(6px);
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, opacity 0.2s ease;
 
         &.playing {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 40px rgba(8, 16, 28, 0.45);
-            border-color: rgba(255, 255, 255, 0.06);
+            transform: translateY(-3px);
+            box-shadow: 0 0 24px rgba(130, 220, 255, 0.25);
+            border-color: rgba(130, 220, 255, 0.25);
         }
 
         &.locked {
-            opacity: 0.52;
-            filter: grayscale(8%);
+            opacity: 0.55;
+            filter: grayscale(15%) brightness(0.8);
 
             .note--locked {
-                color: #7f8b90;
+                color: #6d7c83;
                 font-style: italic;
             }
         }
@@ -431,30 +469,31 @@ $neon-pink: #ff66c4;
             .index {
                 min-width: 60px;
                 height: 60px;
-                border-radius: 12px;
+                border-radius: 14px;
                 display: grid;
                 place-items: center;
-                background: linear-gradient(180deg, #bff7ff, #9fdcff);
-                color: #081018;
-                font-weight: 900;
-                box-shadow: 0 8px 24px rgba(11, 22, 32, 0.18);
+                background: linear-gradient(180deg, #a8d8f7 0%, #84c2e9 100%);
+                color: #0b1a22;
+                font-weight: 800;
+                box-shadow: 0 6px 20px rgba(8, 22, 30, 0.25);
+                text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
             }
 
             .info {
                 .name {
-                    color: #ffffff;
+                    color: #e7faff;
                     font-weight: 700;
+                    letter-spacing: 0.5px;
                 }
 
                 .note {
-                    color: #9aa6ad;
-                    font-size: 0.92rem;
+                    color: #8ca3b0;
+                    font-size: 0.9rem;
                     margin-top: 4px;
                 }
 
                 .note--locked {
-                    color: #7f8b90;
-                    font-style: italic;
+                    color: #687c87;
                 }
             }
         }
@@ -468,20 +507,38 @@ $neon-pink: #ff66c4;
                 &--icon {
                     width: 52px;
                     height: 52px;
-                    border-radius: 12px;
+                    border-radius: 14px;
                     border: none;
                     display: inline-grid;
                     place-items: center;
-                    background: linear-gradient(180deg, #ffe6a8, #ffd580);
-                    color: #1a0f03;
+                    background: linear-gradient(180deg, #92e0ff, #58b6e4);
+                    color: #03252e;
                     font-weight: 700;
                     cursor: pointer;
+                    box-shadow: 0 0 20px rgba(146, 224, 255, 0.3);
+                    transition: all 0.15s ease;
+
+                    &:hover {
+                        background: linear-gradient(180deg, #a6edff, #66c5ee);
+                        box-shadow: 0 0 24px rgba(146, 224, 255, 0.5);
+                    }
                 }
 
-
-
                 &--hint {
-                    color: #7f8b90;
+                    color: #62727b;
+                }
+            }
+
+            a {
+                .el-button {
+                    background: linear-gradient(180deg, #7ed4ff, #54b7e7);
+                    border: none;
+                    color: #012028;
+                    transition: all 0.15s ease;
+
+                    &:hover {
+                        background: linear-gradient(180deg, #a2e9ff, #62c6f2);
+                    }
                 }
             }
         }
