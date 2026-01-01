@@ -1,5 +1,14 @@
 <template>
   <div class="megumi-message-board" aria-live="polite">
+    <!-- 星域背景层 -->
+    <div class="stellar-background" aria-hidden="true">
+      <div class="nebula-layer"></div>
+      <div class="tidal-layer"></div>
+      <div class="starlight-layer"></div>
+    </div>
+
+    <!-- 漂浮星光粒子 -->
+    <canvas ref="starsCanvas" class="stars-canvas" aria-hidden="true"></canvas>
     <!-- 半透明顶部标题 -->
     <header class="board-header" role="banner">
       <div class="title-wrap">
@@ -115,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted, nextTick, onBeforeUnmount } from "vue";
 import { getMessageList, createMessage } from "@/api/modules/message";
 
 const messages = ref<any[]>([]);
@@ -184,11 +193,142 @@ const autoGrow = (e?: Event) => {
   const h = Math.min(ta.scrollHeight, 220);
   ta.style.height = h + "px";
 };
+// ========== 浮动星光 ==========
+interface FloatingStar {
+  id: number;
+  style: {
+    top: string;
+    left: string;
+    width: string;
+    height: string;
+    animationDelay: string;
+  };
+}
+
+const floatingStars = ref<FloatingStar[]>([]);
+
+function initFloatingStars() {
+  const stars: FloatingStar[] = [];
+  const starCount = 15;
+
+  for (let i = 0; i < starCount; i++) {
+    stars.push({
+      id: i,
+      style: {
+        top: `${Math.random() * 100}%`,
+        left: `${Math.random() * 100}%`,
+        width: `${2 + Math.random() * 4}px`,
+        height: `${2 + Math.random() * 4}px`,
+        animationDelay: `${Math.random() * 5}s`,
+      },
+    });
+  }
+
+  floatingStars.value = stars;
+}
+
+// ========== 星空Canvas ==========
+const starsCanvas = ref<HTMLCanvasElement | null>(null);
+let animationFrameId: number | null = null;
+
+function initStarsCanvas() {
+  const canvas = starsCanvas.value;
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  // 设置画布尺寸
+  const resizeCanvas = () => {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  };
+
+  resizeCanvas();
+  window.addEventListener("resize", resizeCanvas);
+
+  // 创建星星
+  const stars: Array<{
+    x: number;
+    y: number;
+    size: number;
+    speed: number;
+    opacity: number;
+  }> = [];
+
+  const starCount = 50;
+
+  for (let i = 0; i < starCount; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: 0.5 + Math.random() * 1.5,
+      speed: 0.1 + Math.random() * 0.3,
+      opacity: 0.3 + Math.random() * 0.7,
+    });
+  }
+
+  // 动画循环
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 绘制星星
+    stars.forEach((star) => {
+      star.y += star.speed;
+      if (star.y > canvas.height) {
+        star.y = 0;
+        star.x = Math.random() * canvas.width;
+      }
+
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(79, 233, 223, ${star.opacity})`;
+      ctx.fill();
+
+      // 添加光晕
+      const gradient = ctx.createRadialGradient(
+        star.x,
+        star.y,
+        0,
+        star.x,
+        star.y,
+        star.size * 3
+      );
+      gradient.addColorStop(0, `rgba(79, 233, 223, ${star.opacity * 0.5})`);
+      gradient.addColorStop(1, "transparent");
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(
+        star.x - star.size * 3,
+        star.y - star.size * 3,
+        star.size * 6,
+        star.size * 6
+      );
+    });
+
+    animationFrameId = requestAnimationFrame(animate);
+  }
+
+  animate();
+
+  return () => {
+    window.removeEventListener("resize", resizeCanvas);
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  };
+}
 
 onMounted(() => {
+  initFloatingStars();
+  const cleanup = initStarsCanvas();
   fetchMessages();
   // ensure textarea autosize initial
   nextTick(() => autoGrow());
+  return () => {
+    if (cleanup) cleanup();
+  };
+});
+onBeforeUnmount(() => {
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
 });
 </script>
 
@@ -216,67 +356,66 @@ onMounted(() => {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* 深海暗角 + 星尘光晕（把视线引向中心列表） */
-  &::after {
-    content: "";
-    position: absolute;
+  .stellar-background {
+    position: fixed;
     inset: 0;
-    pointer-events: none;
-    background: radial-gradient(
-        600px 280px at 18% 10%,
-        rgba(10, 40, 60, 0.28),
-        transparent 18%
-      ),
-      radial-gradient(
-        700px 300px at 82% 88%,
-        rgba(80, 140, 170, 0.06),
-        transparent 22%
-      ),
-      linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.24));
     z-index: 0;
-    mix-blend-mode: overlay;
+
+    .nebula-layer {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+          circle at 20% 30%,
+          rgba(79, 233, 223, 0.05) 0%,
+          transparent 50%
+        ),
+        radial-gradient(
+          circle at 80% 70%,
+          rgba(127, 191, 255, 0.03) 0%,
+          transparent 50%
+        );
+      opacity: 0.4;
+    }
+
+    .tidal-layer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: var(--gradient-tidal);
+      mask-image: linear-gradient(to top, black 20%, transparent);
+    }
+
+    .starlight-layer {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(
+          1px at 20% 20%,
+          rgba(255, 255, 255, 0.8) 1px,
+          transparent 2px
+        ),
+        radial-gradient(
+          1px at 60% 60%,
+          rgba(127, 191, 255, 0.7) 1px,
+          transparent 2px
+        );
+      background-size: 200px 200px, 300px 300px;
+      opacity: 0.08;
+      animation: stars-drift 120s linear infinite;
+    }
   }
 
-  /* 细微浮动星粒 - 使用伪元素渲染，轻量级动画 */
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -20% -10%;
-    background-image: radial-gradient(
-        circle at 10% 20%,
-        rgba(168, 240, 255, 0.06) 0 1px,
-        transparent 2px
-      ),
-      radial-gradient(
-        circle at 70% 30%,
-        rgba(168, 240, 255, 0.04) 0 1px,
-        transparent 2px
-      ),
-      radial-gradient(
-        circle at 40% 70%,
-        rgba(120, 200, 255, 0.03) 0 1px,
-        transparent 2px
-      );
-    opacity: 0.85;
-    z-index: 0;
-    filter: blur(1px);
-    animation: floatStars 18s linear infinite;
+  /* 星空Canvas */
+  .stars-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
     pointer-events: none;
-  }
-
-  @keyframes floatStars {
-    0% {
-      transform: translateY(0) translateX(0);
-      opacity: 0.9;
-    }
-    50% {
-      transform: translateY(-12px) translateX(6px);
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(0) translateX(0);
-      opacity: 0.9;
-    }
+    opacity: 0.6;
   }
 
   /* ---------- 顶部标题（毛玻璃 + 晶体装饰） ---------- */

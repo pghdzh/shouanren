@@ -19,3 +19,10 @@ export const addRankingItem = (data: {
 }): any => {
   return http.post("/api/rankings", data);
 };
+
+export const updateRankingItem = (
+  id: number,
+  data: { nickname?: string; count?: number; character_key?: string }
+): any => {
+  return http.put(`/api/rankings/${id}`, data);
+};

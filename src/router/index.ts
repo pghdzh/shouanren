@@ -31,8 +31,20 @@ const router = createRouter({
       component: () => import("@/views/wishView/index.vue"),
     },
     {
+      path: "/talk",
+      component: () => import("@/views/talkView/index.vue"),
+    },
+    {
       path: "/voice",
       component: () => import("@/views/voiceView/index.vue"),
+    },
+    {
+      path: "/music",
+      component: () => import("@/views/musicView/index.vue"),
+    },
+    {
+      path: "/wiki",
+      component: () => import("@/views/wikiView/index.vue"),
     },
     {
       path: "/thanks",

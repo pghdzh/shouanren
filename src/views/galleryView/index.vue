@@ -578,6 +578,11 @@ $text: #fde8e8;
 $highlight: #ffd700;
 $ice-blue: #bff7ff;
 $neon-pink: #ff66c4;
+$deep-sea: #0a1a24;
+$crystal-blue: #bff7ff;
+$energy-cyan: #12b3d3;
+$dark-bg: #0d0d0d;
+$text-light: #fde8e8;
 @use "sass:color";
 
 @keyframes fadeInUp {
@@ -596,7 +601,7 @@ $neon-pink: #ff66c4;
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 1;
+  z-index: 999;
 }
 
 .chibi-img {
@@ -610,15 +615,41 @@ $neon-pink: #ff66c4;
 }
 
 .gallery-container {
-  background: radial-gradient(circle at center, #111 0%, $bg 100%);
-  color: $text;
+  background: radial-gradient(
+      ellipse at 30% 20%,
+      rgba(20, 60, 90, 0.4) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(40, 100, 140, 0.3) 0%,
+      transparent 30%
+    ),
+    linear-gradient(180deg, $deep-sea 0%, #0a1520 100%);
   min-height: 100vh;
-  padding-bottom: 60px;
-
+  color: $text-light;
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+        1px 1px at 20% 30%,
+        rgba($crystal-blue, 0.6) 1px,
+        transparent 0
+      ),
+      radial-gradient(
+        1px 1px at 60% 70%,
+        rgba($crystal-blue, 0.4) 1px,
+        transparent 0
+      );
+    background-size: 100px 100px;
+    z-index: 0;
+    pointer-events: none;
+  }
   .section {
     padding: 80px 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+
 
     .sort-controls {
       margin: 16px 0;
@@ -720,39 +751,68 @@ $neon-pink: #ff66c4;
       }
     }
 
+    // 2. 守岸人风格卡片 (核心)
     .gallery-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 24px;
+      padding: 20px;
+      position: relative;
+      z-index: 2;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 12px;
+      }
 
       .card {
-        perspective: 1000px;
+        perspective: 1200px;
+        border-radius: 16px;
+        overflow: hidden;
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(30px);
+        animation: cardRise 0.7s ease forwards;
 
-        &.visible {
-          animation: fadeInUp 0.6s ease forwards;
+        @keyframes cardRise {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
 
-        &.loaded {
-          // Blur-up & grayscale removed
-          .card-inner img {
-            filter: none;
-            opacity: 1;
-          }
+        // 晶体边框效果
+        &::before {
+          content: "";
+          position: absolute;
+          inset: -1px;
+          border-radius: 17px;
+          padding: 2px;
+          background: linear-gradient(
+            135deg,
+            rgba($crystal-blue, 0.4),
+            rgba($energy-cyan, 0.2),
+            transparent 60%
+          );
+          -webkit-mask: linear-gradient(#fff 0 0) content-box,
+            linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          z-index: 1;
+          pointer-events: none;
         }
 
         .card-inner {
           position: relative;
-          border-radius: 12px;
-          overflow: hidden;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+          width: 100%;
+          aspect-ratio: 3/4;
           transform-style: preserve-3d;
-          transition: transform 0.5s ease, box-shadow 0.5s ease;
+          transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+          border-radius: 16px;
+          overflow: hidden;
 
           &:hover {
-            transform: rotateY(6deg) rotateX(3deg) scale(1.05);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.9);
+            transform: rotateY(8deg) rotateX(2deg) scale(1.03);
           }
 
           img {
@@ -760,107 +820,101 @@ $neon-pink: #ff66c4;
             height: 100%;
             object-fit: cover;
             display: block;
-            filter: blur(20px) grayscale(100%);
-            opacity: 0.6;
-            transition: filter 0.6s ease, opacity 0.6s ease;
+            transition: filter 0.5s ease;
           }
 
+          // 能量覆盖层
           .overlay {
             position: absolute;
             bottom: 0;
-            width: 100%;
-            padding: 12px 0;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            left: 0;
+            right: 0;
+            background: linear-gradient(
+              to top,
+              rgba($deep-sea, 0.95) 0%,
+              rgba($energy-cyan, 0.2) 50%,
+              transparent 100%
+            );
+            padding: 20px 16px 16px;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
             text-align: center;
-            opacity: 0;
-            transition: opacity 0.4s;
 
             span {
-              color: $text;
-              font-family: "Cinzel Decorative", serif;
-              font-size: 1.1rem;
-              letter-spacing: 1px;
-              background: rgba(0, 0, 0, 0.6);
-              padding: 4px 12px;
-              border-radius: 20px;
+              color: $crystal-blue;
+              font-family: "Segoe UI", system-ui, sans-serif;
+              font-size: 0.95rem;
+              font-weight: 600;
+              letter-spacing: 0.5px;
+              text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
             }
           }
 
           &:hover .overlay {
-            opacity: 1;
+            transform: translateY(0);
           }
 
+          // 守岸人风格点赞按钮
           .like-btn {
             position: absolute;
-            bottom: 12px;
-            right: 12px;
-            background: transparent;
+            top: 16px;
+            right: 16px;
+            background: rgba($deep-sea, 0.75);
+            backdrop-filter: blur(8px);
             border: none;
-            cursor: pointer;
-            z-index: 2;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 4px;
-            border-radius: 50%;
-            transition: transform 0.2s ease;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 3;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
             &:hover {
-              transform: scale(1.3);
+              background: rgba($energy-cyan, 0.2);
+              transform: scale(1.1);
             }
 
             .heart {
-              width: 24px;
-              height: 24px;
+              width: 22px;
+              height: 22px;
               background: url("/icons/heart-red-outline.svg") no-repeat center;
               background-size: contain;
               transition: all 0.3s ease;
-              filter: drop-shadow(0 0 4px rgba(255, 0, 0, 0.7));
-            }
 
-            .liked {
-              background: url("/icons/heart-red-filled.svg") no-repeat center;
-              background-size: contain;
-              animation: pop 0.4s ease;
+              &.liked {
+                background: url("/icons/heart-red-filled.svg") no-repeat center;
+                background-size: contain;
+                animation: pulseGlow 0.6s ease;
+                filter: drop-shadow(0 0 8px rgba($crystal-blue, 0.8));
+              }
 
-              /* 持续呼吸光效 */
-              &::after {
-                content: "";
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 40px;
-                height: 40px;
-                background: rgba(255, 0, 0, 0.3);
-                border-radius: 50%;
-                transform: translate(-50%, -50%) scale(0);
-                animation: pulse 1.2s ease-out infinite;
-                pointer-events: none;
+              @keyframes pulseGlow {
+                0% {
+                  transform: scale(1);
+                }
+                50% {
+                  transform: scale(1.3);
+                }
+                100% {
+                  transform: scale(1);
+                }
               }
             }
 
             .like-count {
-              font-size: 1rem;
-              color: #ff4b4b;
-              text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+              position: absolute;
+              bottom: -20px;
+              left: 50%;
+              transform: translateX(-50%);
+              font-size: 0.8rem;
+              color: $crystal-blue;
               font-weight: bold;
-            }
-          }
-
-          @keyframes pulse {
-            0% {
-              transform: translate(-50%, -50%) scale(0.6);
-              opacity: 0.6;
-            }
-
-            50% {
-              transform: translate(-50%, -50%) scale(1.2);
-              opacity: 0;
-            }
-
-            100% {
-              transform: translate(-50%, -50%) scale(0.6);
-              opacity: 0;
+              white-space: nowrap;
             }
           }
         }
