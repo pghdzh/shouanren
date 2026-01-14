@@ -2,10 +2,18 @@
   <header class="shouanren-header">
     <!-- 主标题与星光徽章 -->
     <div class="header-brand">
-      <div class="starlight-badge">
-        <div class="star-core"></div>
-        <div class="star-glow"></div>
+      <div
+        class="starlight-badge"
+        @click="toggleBGM"
+        :title="isBGMPlaying ? '关闭背景音乐' : '播放背景音乐'"
+      >
+        <!-- BGM状态指示器 -->
+        <div class="bgm-indicator" :class="{ 'bgm-playing': isBGMPlaying }">
+          <div class="note-icon">{{ isBGMPlaying ? "♪" : "♪" }}</div>
+          <div class="note-glow" v-if="isBGMPlaying"></div>
+        </div>
       </div>
+
       <h1 class="site-title">
         <span class="title-text">守岸人·星域守望</span>
         <span class="title-sub">Shouanren · Stellar Domain</span>
@@ -46,9 +54,9 @@
     >
       <div class="nav-backdrop" @click="mobileNavOpen = false"></div>
       <div class="nav-content">
-        <!-- 导航项 -->
+        <!-- 主要导航项 -->
         <RouterLink
-          v-for="item in filteredNavItems"
+          v-for="item in mainNavItems"
           :key="item.name"
           :to="item.path"
           class="nav-link"
@@ -58,6 +66,42 @@
           <span class="link-text">{{ item.name }}</span>
           <span class="link-glow"></span>
         </RouterLink>
+
+        <!-- 更多下拉菜单（桌面端） -->
+        <div class="more-dropdown-wrapper" v-if="dropdownNavItems.length > 0">
+          <div
+            class="nav-link more-dropdown-trigger"
+            :class="{ 'nav-active': isDropdownActive }"
+            @mouseenter="openDropdown"
+            @mouseleave="closeDropdown"
+          >
+            <span class="link-text">更多</span>
+            <span class="dropdown-chevron">▼</span>
+            <span class="link-glow"></span>
+          </div>
+
+          <div
+            class="more-dropdown-menu"
+            :class="{ 'dropdown-open': isDropdownOpen }"
+            @mouseenter="openDropdown"
+            @mouseleave="closeDropdown"
+          >
+            <RouterLink
+              v-for="item in dropdownNavItems"
+              :key="item.name"
+              :to="item.path"
+              class="dropdown-item"
+              active-class="dropdown-active"
+              @click="
+                mobileNavOpen = false;
+                closeDropdown();
+              "
+            >
+              <span class="dropdown-text">{{ item.name }}</span>
+              <span class="dropdown-glow"></span>
+            </RouterLink>
+          </div>
+        </div>
 
         <!-- 外部链接 -->
         <a
@@ -74,18 +118,17 @@
         <!-- 移动端底部装饰 -->
         <div class="mobile-nav-footer" v-if="mobileNavOpen">
           <div class="footer-ornament"></div>
-          <p class="footer-quote">“于此岸，守望星海回响”</p>
+          <p class="footer-quote">"于此岸，守望星海回响"</p>
         </div>
       </div>
     </nav>
-
     <!-- 背景星光粒子 (性能优化) -->
     <div class="starlight-particles" aria-hidden="true"></div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
 import { io } from "socket.io-client";
 
 // 配置导航项 (含图标)
@@ -103,16 +146,6 @@ const navItems = [
   { name: "鸣谢星光", path: "/thanks" },
 ];
 
-// 过滤掉重复的“AI语音”项 (根据路径)
-const filteredNavItems = computed(() => {
-  const seen = new Set();
-  return navItems.filter((item) => {
-    if (seen.has(item.path)) return false;
-    seen.add(item.path);
-    return true;
-  });
-});
-
 // 移动端导航状态
 const mobileNavOpen = ref(false);
 const toggleMobileNav = () => {
@@ -126,8 +159,97 @@ const socket: any = io("http://36.150.237.25:3000", {
   query: { siteId },
   transports: ["websocket", "polling"], // 兼容性
 });
+// BGM相关状态
+const isBGMPlaying = ref(false);
+const bgmAudio = ref<HTMLAudioElement | null>(null);
+
+// 切换BGM播放状态
+const toggleBGM = () => {
+  if (!bgmAudio.value) {
+    bgmAudio.value = new Audio("/漂泊的终点.mp3");
+    bgmAudio.value.loop = true;
+    bgmAudio.value.volume = 0.5; // 设置音量
+
+    // 添加播放事件监听
+    bgmAudio.value.addEventListener("play", () => {
+      isBGMPlaying.value = true;
+    });
+
+    bgmAudio.value.addEventListener("pause", () => {
+      isBGMPlaying.value = false;
+    });
+
+    // 尝试播放（用户交互后）
+    bgmAudio.value.play().catch((e) => {
+      console.warn("自动播放被阻止:", e);
+      // 需要用户交互后才能播放，设置状态为false
+      isBGMPlaying.value = false;
+    });
+  } else {
+    if (isBGMPlaying.value) {
+      bgmAudio.value.pause();
+    } else {
+      bgmAudio.value.play().catch((e) => {
+        console.warn("播放失败:", e);
+      });
+    }
+  }
+};
+// 从AI对话开始分割，前5项为主导航，后面的为下拉菜单
+const splitIndex = navItems.findIndex((item) => item.name === "AI对话");
+const mainNavItems = ref(navItems.slice(0, splitIndex)); // 前5项
+const dropdownNavItems = navItems.slice(splitIndex); // 从AI对话开始的所有项
+
+// 下拉菜单状态
+const isDropdownOpen = ref(false);
+const isDropdownActive = ref(false);
+
+// 打开下拉菜单
+const openDropdown = () => {
+  isDropdownOpen.value = true;
+};
+
+// 关闭下拉菜单
+const closeDropdown = () => {
+  isDropdownOpen.value = false;
+};
+
+// 监听路由变化，检查下拉菜单项是否激活
+import { useRoute } from "vue-router";
+const route = useRoute();
+
+const checkDropdownActive = () => {
+  const currentPath = route.path;
+  isDropdownActive.value = dropdownNavItems.some((item) => {
+    if (item.path === "/") {
+      return currentPath === "/";
+    }
+    return currentPath.startsWith(item.path);
+  });
+};
+
+// 监听路由变化
+watch(
+  () => route.path,
+  () => {
+    checkDropdownActive();
+  }
+);
+// 响应式屏幕宽度检测
+const isMobile = ref(false);
+const checkScreenWidth = () => {
+  isMobile.value = window.innerWidth <= 768;
+  if (isMobile.value) {
+    mainNavItems.value = navItems;
+  } else {
+    mainNavItems.value = navItems.slice(0, splitIndex);
+  }
+};
 
 onMounted(() => {
+  checkDropdownActive();
+  checkScreenWidth(); // 添加这一行
+  window.addEventListener("resize", checkScreenWidth);
   socket.on("onlineCount", (count: number) => {
     onlineCount.value = count;
   });
@@ -139,6 +261,10 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   if (socket) socket.disconnect();
+  if (bgmAudio.value) {
+    bgmAudio.value.pause();
+    bgmAudio.value = null;
+  }
 });
 </script>
 
@@ -219,33 +345,73 @@ onBeforeUnmount(() => {
   width: 40px;
   height: 40px;
   flex-shrink: 0;
-  .star-core {
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(
-      circle at 30% 30%,
-      var(--color-star-blue),
-      var(--color-star-cyan) 60%,
-      transparent 80%
-    );
-    border-radius: 50%;
-    filter: blur(1px);
-    animation: star-pulse 4s ease-in-out infinite;
+  cursor: pointer; // 添加指针样式
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+
+    .bgm-indicator {
+      opacity: 1;
+    }
   }
-  .star-glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 180%;
-    height: 180%;
-    transform: translate(-50%, -50%);
-    background: var(--gradient-glow);
-    border-radius: 50%;
-    opacity: 0.7;
-    animation: glow-rotate 20s linear infinite;
+}
+.bgm-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+
+  .note-icon {
+    font-size: 16px;
+    color: var(--color-star-cyan);
+    text-shadow: 0 0 8px rgba(var(--color-star-cyan-rgb), 0.6);
+    transition: all 0.3s ease;
+  }
+
+  &.bgm-playing {
+    .note-icon {
+      color: var(--color-star-blue);
+      text-shadow: 0 0 12px rgba(var(--color-star-blue-rgb), 0.8);
+      animation: note-pulse 1.5s ease-in-out infinite;
+    }
+
+    .note-glow {
+      position: absolute;
+      width: 120%;
+      height: 120%;
+      background: radial-gradient(
+        circle at center,
+        rgba(var(--color-star-blue-rgb), 0.3) 0%,
+        rgba(var(--color-star-blue-rgb), 0.1) 40%,
+        transparent 70%
+      );
+      border-radius: 50%;
+      z-index: -1;
+    }
   }
 }
 
+// 添加音符脉动动画
+@keyframes note-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
 .site-title {
   display: flex;
   flex-direction: column;
@@ -353,6 +519,7 @@ onBeforeUnmount(() => {
 }
 
 /* 导航菜单 */
+/* 导航菜单 */
 .stellar-nav {
   display: flex;
   align-items: center;
@@ -367,6 +534,185 @@ onBeforeUnmount(() => {
     border: 1px solid rgba(var(--color-star-cyan-rgb), 0.08);
     box-shadow: 0 8px 32px rgba(5, 15, 30, 0.3),
       inset 0 1px 0 rgba(var(--color-mist-light-rgb), 0.05);
+    position: relative;
+  }
+}
+
+/* 更多下拉菜单 */
+.more-dropdown-wrapper {
+  position: relative;
+
+  .more-dropdown-trigger {
+    position: relative;
+    cursor: pointer;
+
+    .dropdown-chevron {
+      font-size: 0.7em;
+      margin-left: 4px;
+      transition: transform 0.3s ease;
+      opacity: 0.8;
+    }
+
+    &:hover .dropdown-chevron {
+      transform: rotate(180deg);
+    }
+  }
+
+  .more-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 8px;
+    min-width: 180px;
+    background: rgba(10, 26, 42, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(var(--color-star-cyan-rgb), 0.15);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(5, 15, 30, 0.4),
+      0 0 60px rgba(var(--color-star-blue-rgb), 0.1);
+    padding: 8px;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: 20px;
+      width: 12px;
+      height: 12px;
+      background: rgba(10, 26, 42, 0.95);
+      border-left: 1px solid rgba(var(--color-star-cyan-rgb), 0.15);
+      border-top: 1px solid rgba(var(--color-star-cyan-rgb), 0.15);
+      transform: rotate(45deg);
+    }
+
+    &.dropdown-open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    color: rgba(var(--color-mist-light-rgb), 0.85);
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      background: rgba(var(--color-star-blue-rgb), 0.1);
+      color: var(--color-mist-light);
+      transform: translateX(4px);
+
+      .dropdown-glow {
+        opacity: 1;
+      }
+    }
+
+    &.dropdown-active {
+      color: var(--color-star-blue);
+      background: rgba(var(--color-star-blue-rgb), 0.08);
+      font-weight: 600;
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 60%;
+        background: var(--color-star-blue);
+        border-radius: 0 2px 2px 0;
+      }
+    }
+
+    .dropdown-glow {
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(var(--color-star-blue-rgb), 0.15),
+        transparent
+      );
+      transition: left 0.7s ease;
+      opacity: 0;
+    }
+
+    &:hover .dropdown-glow {
+      left: 100%;
+    }
+  }
+}
+
+/* 移动端响应式适配 */
+@media (max-width: 1024px) {
+  .online-indicator .label {
+    display: none;
+  }
+  .nav-link {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+
+  /* 在平板及以下设备隐藏下拉菜单，显示完整导航 */
+  .more-dropdown-wrapper {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .shouanren-header {
+    padding: 0 16px;
+    min-height: 64px;
+  }
+
+  /* 移动端显示所有导航项 */
+  .nav-content {
+    flex-direction: column;
+  }
+
+  /* 确保移动端显示所有导航项 */
+  .more-dropdown-wrapper {
+    display: none;
+  }
+}
+
+/* 添加移动端特殊样式，确保导航项完整显示 */
+@media (max-width: 768px) {
+  .stellar-nav.mobile-active .nav-content {
+    display: flex;
+    flex-direction: column;
+
+    /* 显示所有导航项（包括原来在下拉菜单中的） */
+    .nav-link {
+      display: flex !important;
+    }
+  }
+}
+
+/* 确保在PC端大屏幕下，主要导航项和更多下拉菜单都显示 */
+@media (min-width: 1025px) {
+  .nav-content {
+    /* 主要导航项 + 更多 + 外部链接 */
+    .nav-link:not(.more-dropdown-trigger) {
+      display: flex;
+    }
   }
 }
 

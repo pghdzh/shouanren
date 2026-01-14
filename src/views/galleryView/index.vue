@@ -859,8 +859,8 @@ $text-light: #fde8e8;
             position: absolute;
             top: 16px;
             right: 16px;
-            background: rgba($deep-sea, 0.75);
-            backdrop-filter: blur(8px);
+            background: rgba($deep-sea, 0);
+           
             border: none;
             border-radius: 50%;
             width: 44px;
@@ -911,8 +911,8 @@ $text-light: #fde8e8;
               bottom: -20px;
               left: 50%;
               transform: translateX(-50%);
-              font-size: 0.8rem;
-              color: $crystal-blue;
+              font-size: 1.2rem;
+              color: red;
               font-weight: bold;
               white-space: nowrap;
             }

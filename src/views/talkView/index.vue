@@ -340,7 +340,7 @@ function clearChat() {
       {
         id: Date.now(),
         role: "bot",
-        text: "今天的风很温柔呢，是和你一起到来的。",
+        text: "你来了，今天的黑海岸很安静，适合听潮声。群星在夜空中低语，而我在这里，等待着每一次与你的对话。",
       },
     ];
     localStorage.removeItem(STORAGE_KEY);
@@ -360,7 +360,7 @@ function loadChatLog(): ChatMsg[] {
     {
       id: Date.now(),
       role: "bot",
-      text: "今天的风很温柔呢，是和你一起到来的。",
+      text: "你来了，今天的黑海岸很安静，适合听潮声。群星在夜空中低语，而我在这里，等待着每一次与你的对话。",
     },
   ];
 }
@@ -510,8 +510,8 @@ onBeforeUnmount(() => {
 <style scoped lang="scss">
 /* 颜色变量（集中管理）*/
 
-$accent-1: #2e88c9; // 暗紫主光（冷雅）
-$accent-2: #7fd3ff; // 冷海蓝高光（湿光感）
+$accent-1: #4fe9df; // 暗紫主光（冷雅）
+$accent-2: #7fbfff; // 冷海蓝高光（湿光感）
 
 $accent-2-light: #f5fafc; // $accent-2 向白方向提亮约12%（手算替代 lighten）
 

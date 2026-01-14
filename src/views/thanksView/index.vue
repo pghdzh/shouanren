@@ -3,28 +3,30 @@
     <div class="ack-container">
       <h1 class="page-title">鸣谢名单</h1>
       <ul class="ack-list">
-        <li v-for="(item, index) in acknowledgements" :key="index" class="ack-item"
-          :style="{ animationDelay: index * 0.15 + 's' }">
+        <li
+          v-for="(item, index) in acknowledgements"
+          :key="index"
+          class="ack-item"
+          :style="{ animationDelay: index * 0.15 + 's' }"
+        >
           <span class="nickname">{{ item.nickname }}:</span>
 
           <span class="suggestion">{{ item.suggestion }}</span>
         </li>
       </ul>
-      <div v-if="acknowledgements.length === 0" class="empty">
-        暂无鸣谢内容
-      </div>
+      <div v-if="acknowledgements.length === 0" class="empty">暂无鸣谢内容</div>
     </div>
-    <footer class="ack-footer">
-      © 2025 守岸人电子设定集 · 感谢所有支持者
-    </footer>
+    <footer class="ack-footer">© 2025 守岸人电子设定集 · 感谢所有支持者</footer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive } from "vue";
 const acknowledgements = reactive([
-  { nickname: 'SnowMeteor丶', suggestion: '添加bgm播放器' },
-])
+  { nickname: "SnowMeteor丶", suggestion: "添加bgm播放器" },
+  { nickname: "赤雪", suggestion: "增加网站bmg，在顶部导航最左边（因浏览器规定限制不能自动播放需要手动点击）" },
+  { nickname: "赤雪", suggestion: "优化pc端下导航显示" },
+]);
 </script>
 
 <style lang="scss" scoped>
@@ -46,8 +48,6 @@ const acknowledgements = reactive([
   position: relative;
   color: #fff;
   overflow: hidden;
-
-
 }
 
 @keyframes bgGradient {
@@ -63,8 +63,6 @@ const acknowledgements = reactive([
     background-position: 0% 50%;
   }
 }
-
-
 
 .page-title {
   font-size: 2.2rem;
@@ -100,7 +98,7 @@ const acknowledgements = reactive([
     .nickname {
       font-weight: bold;
       margin-right: 0.5rem;
-       background: linear-gradient(90deg, #4fe9df 0%, #66c8ff 80%);
+      background: linear-gradient(90deg, #4fe9df 0%, #66c8ff 80%);
       -webkit-background-clip: text;
       color: transparent;
       text-shadow: 0 0 6px rgba(255, 140, 240, 0.5);
