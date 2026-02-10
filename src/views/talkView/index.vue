@@ -309,21 +309,23 @@ async function sendMessage() {
     //  throw new Error("测试错误");
     const history = chatLog.value.filter((msg) => !msg.isEgg && !msg.isError);
     const botReply = await sendMessageToHui(userText, history);
-    chatLog.value.push({
-      id: Date.now() + 1,
-      role: "bot",
-      text: botReply,
-    });
-
-
+    if (botReply == "error") {
+      chatLog.value.push({
+        id: Date.now() + 2,
+        role: "bot",
+        text: "API余额耗尽了，去b站提醒我充钱吧",
+        isError: true,
+      });
+    } else {
+      chatLog.value.push({
+        id: Date.now() + 1,
+        role: "bot",
+        text: botReply,
+      });
+    }
   } catch (e) {
     console.error(e);
-    chatLog.value.push({
-      id: Date.now() + 2,
-      role: "bot",
-      text: "API余额耗尽了，去b站提醒我充钱吧",
-      isError: true,
-    });
+   
   } finally {
     loading.value = false;
     await scrollToBottom();
