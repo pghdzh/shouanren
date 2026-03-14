@@ -24,6 +24,6 @@ export const getMusicUrl = (fileName: string): string => {
   // 若你希望返回完整 URL（带域名），可以改为：
   // const base = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
   // return `${base}/music/${encodeURIComponent(fileName)}`;
-  return `http://36.150.237.25:3000/music/${encodeURIComponent(fileName)}`;
+  return import.meta.env.VITE_API_BASE_URL+`/music/${encodeURIComponent(fileName)}`;
 };
 

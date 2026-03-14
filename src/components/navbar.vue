@@ -105,7 +105,7 @@
 
         <!-- 外部链接 -->
         <a
-          href="http://slty.site/#/redirector"
+          href="https://slty.site/#/redirector"
           target="_blank"
           rel="noopener noreferrer"
           class="nav-link external"
@@ -155,7 +155,7 @@ const toggleMobileNav = () => {
 // 在线状态逻辑
 const siteId = "shouanren";
 const onlineCount = ref<number | null>(null);
-const socket: any = io("http://36.150.237.25:3000", {
+const socket: any = io(import.meta.env.VITE_API_BASE_URL, {
   query: { siteId },
   transports: ["websocket", "polling"], // 兼容性
 });
